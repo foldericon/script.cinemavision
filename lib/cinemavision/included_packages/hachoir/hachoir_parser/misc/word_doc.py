@@ -10,7 +10,12 @@ Documents:
    Library. HTMLified June 1998. Revised Aug 1 1998, added missing Definitions
    section. Revised Dec 21 1998, added missing Document Properties (section).
 """
+from __future__ import division
 
+from builtins import str
+from builtins import range
+from builtins import object
+from past.utils import old_div
 from hachoir_core.field import (FieldSet, Enum,
     Bit, Bits,
     UInt8, Int16, UInt16, UInt32, Int32,
@@ -374,7 +379,7 @@ class TableParsers(object):
             extra_data_field = UInt16(self, "extra_data_len", "Size of optional extra data after each string")
             yield extra_data_field
             extra_data_len = extra_data_field.value
-            for i in xrange(self["count"].value):
+            for i in range(self["count"].value):
                 if self.name == "SttbfAssoc":
                     desc = self.SttbfAssocDESC.get(i, None)
                 else:
@@ -401,10 +406,10 @@ class TableParsers(object):
                 return
             if size is None:
                 size = chunk_parser.static_size // 8
-            n = (self.size / 8 - 4) / (4 + size)
-            for i in xrange(n+1):
+            n = old_div((old_div(self.size, 8) - 4), (4 + size))
+            for i in range(n+1):
                 yield UInt32(self, "cp_fc[]", "CP or FC value")
-            for i in xrange(n):
+            for i in range(n):
                 yield chunk_parser(self, "obj[]")
 
 class WordTableParser(OLE2FragmentParser):

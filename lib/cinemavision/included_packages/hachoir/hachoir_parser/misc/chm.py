@@ -14,7 +14,10 @@ Document:
 Author: Victor Stinner
 Creation date: 2007-03-04
 """
+from __future__ import print_function
 
+from builtins import str
+from builtins import range
 from hachoir_core.field import (Field, FieldSet, ParserError, RootSeekableFieldSet,
     Int32, UInt16, UInt32, UInt64,
     RawBytes, PaddingBytes,
@@ -133,7 +136,7 @@ class PMGL(FieldSet):
         num_quickref = (entry_count // quickref_frequency)
         if entry_count % quickref_frequency == 0:
             num_quickref -= 1
-        print(self.current_size//8, quickref_frequency, num_quickref)
+        print((self.current_size//8, quickref_frequency, num_quickref))
         padding = (self["free_space"].value - (num_quickref*2+2))
         if padding:
             yield PaddingBytes(self, "padding", padding)
@@ -173,7 +176,7 @@ class Directory(FieldSet):
 
         if nb_dir < 0:
             nb_dir = 1
-        for index in xrange(nb_dir):
+        for index in range(nb_dir):
             yield PMGL(self, "pmgl[]", size=block_size)
 
         if self.current_size < self.size:
@@ -211,7 +214,7 @@ class ResetTable(FieldSet):
         yield UInt64(self, "uncompressed_size")
         yield UInt64(self, "compressed_size")
         yield UInt64(self, "block_size", "Block size in bytes")
-        for i in xrange(self["count"].value):
+        for i in range(self["count"].value):
             yield UInt64(self, "block_location[]", "location in compressed data of 1st block boundary in uncompressed data")
 
 class SystemEntry(FieldSet):

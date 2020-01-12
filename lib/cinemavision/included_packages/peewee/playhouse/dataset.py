@@ -1,10 +1,16 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import next
+from past.builtins import basestring
+from builtins import object
 import csv
 import datetime
 from decimal import Decimal
 import json
 import operator
 try:
-    from urlparse import urlparse
+    from urllib.parse import urlparse
 except ImportError:
     from urllib.parse import urlparse
 import sys
@@ -36,7 +42,7 @@ class DataSet(object):
         self._migrator = SchemaMigrator.from_database(self._database)
 
         class BaseModel(Model):
-            class Meta:
+            class Meta(object):
                 database = self._database
         self._base_model = BaseModel
         self._export_formats = self.get_export_formats()
@@ -161,7 +167,7 @@ class Table(object):
         return iter(self.find().iterator())
 
     def _create_model(self):
-        class Meta:
+        class Meta(object):
             db_table = self.name
         return type(
             str(self.name),
@@ -217,7 +223,7 @@ class Table(object):
         if filters:
             expressions = [
                 (self.model_class._meta.fields[column] == value)
-                for column, value in filters.items()]
+                for column, value in list(filters.items())]
             query = query.where(reduce(conjunction, expressions))
         return query
 

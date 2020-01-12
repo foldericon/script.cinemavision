@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import str
+from builtins import object
 import hachoir_core.config as config
 from hachoir_core.field import Parser as GenericParser
 from hachoir_core.error import HACHOIR_ERRORS, HachoirError, error
@@ -78,7 +81,7 @@ class HachoirParser(object):
                     self._description = makeUnicode(self._description)
             except HACHOIR_ERRORS as err:
                 error("Error getting description of %s: %s" \
-                    % (self.path, unicode(err)))
+                    % (self.path, str(err)))
                 self._description = self.PARSER_TAGS["description"]
         return self._description
     description = property(_getDescription,
@@ -89,7 +92,7 @@ class HachoirParser(object):
             try:
                 self._mime_type = self.createMimeType()
             except HACHOIR_ERRORS as err:
-                self.error("Error when creating MIME type: %s" % unicode(err))
+                self.error("Error when creating MIME type: %s" % str(err))
             if not self._mime_type \
             and self.createMimeType != Parser.createMimeType:
                 self._mime_type = Parser.createMimeType(self)

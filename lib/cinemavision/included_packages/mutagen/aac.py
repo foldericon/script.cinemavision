@@ -10,7 +10,11 @@
 * ADIF - Audio Data Interchange Format
 * See ISO/IEC 13818-7 / 14496-03
 """
+from __future__ import division
 
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import mutagen
 from mutagen import StreamInfo
 from mutagen._file import FileType
@@ -82,7 +86,7 @@ class _ADTSStream(object):
 
         self._samples = 0
         self._payload = 0
-        self._start = r.get_position() / 8
+        self._start = old_div(r.get_position(), 8)
         self._last = self._start
 
     @property
@@ -197,9 +201,9 @@ class _ADTSStream(object):
         r.skip(left)
         assert r.is_aligned()
 
-        self._payload += (left - crc_overhead) / 8
+        self._payload += old_div((left - crc_overhead), 8)
         self._samples += (nordbif + 1) * 1024
-        self._last = r.get_position() / 8
+        self._last = old_div(r.get_position(), 8)
 
         self.parsed_frames += 1
         return True
@@ -241,7 +245,7 @@ class ProgramConfigElement(object):
         elms = num_front_channel_elements + num_side_channel_elements + \
             num_back_channel_elements
         channels = 0
-        for i in xrange(elms):
+        for i in range(elms):
             channels += 1
             element_is_cpe = r.bits(1)
             if element_is_cpe:
@@ -319,7 +323,7 @@ class AACInfo(StreamInfo):
             self.channels = pce.channels
 
             # other pces..
-            for i in xrange(npce):
+            for i in range(npce):
                 ProgramConfigElement(r)
             r.align()
         except BitReaderError as e:
@@ -330,7 +334,7 @@ class AACInfo(StreamInfo):
         fileobj.seek(0, 2)
         length = fileobj.tell() - start
         if self.bitrate != 0:
-            self.length = (8.0 * length) / self.bitrate
+            self.length = old_div((8.0 * length), self.bitrate)
 
     def _parse_adts(self, fileobj, start_offset):
         max_initial_read = 512
@@ -343,7 +347,7 @@ class AACInfo(StreamInfo):
         # Try up to X times to find a sync word and read up to Y frames.
         # If more than Z frames are valid we assume a valid stream
         offset = start_offset
-        for i in xrange(max_sync_tries):
+        for i in range(max_sync_tries):
             fileobj.seek(offset)
             s = _ADTSStream.find_stream(fileobj, max_initial_read)
             if s is None:
@@ -351,7 +355,7 @@ class AACInfo(StreamInfo):
             # start right after the last found offset
             offset += s.offset + 1
 
-            for i in xrange(frames_max):
+            for i in range(frames_max):
                 if not s.parse_frame():
                     break
                 if not s.sync(max_resync_read):

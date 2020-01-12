@@ -1,6 +1,7 @@
+from __future__ import absolute_import
 import os
 import time
-import scraper
+from . import scraper
 from ... import util
 from .. import _scrapers
 

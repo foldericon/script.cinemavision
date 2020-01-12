@@ -50,6 +50,7 @@ put after the `db = ...` line:
 See a more elaborate example with this code at
 https://gist.github.com/thedod/11048875
 """
+from builtins import object
 import datetime
 import decimal
 

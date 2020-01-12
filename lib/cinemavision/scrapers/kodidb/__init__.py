@@ -1,4 +1,5 @@
-import scraper
+from __future__ import absolute_import
+from . import scraper
 from lib import cvutil
 from ... import util
 from ... import ratings

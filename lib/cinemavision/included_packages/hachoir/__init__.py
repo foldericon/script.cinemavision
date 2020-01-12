@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import os
 import sys
 import inspect
@@ -7,6 +8,6 @@ cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile(insp
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 
-import hachoir_core
-import hachoir_parser
-import hachoir_metadata
+from . import hachoir_core
+from . import hachoir_parser
+from . import hachoir_metadata

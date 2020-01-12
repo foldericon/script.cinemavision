@@ -1,8 +1,9 @@
+from builtins import object
 import os, sys, time
 import hachoir_core.config as config
 from hachoir_core.i18n import _
 
-class Log:
+class Log(object):
     LOG_INFO   = 0
     LOG_WARN   = 1
     LOG_ERROR  = 2
@@ -88,7 +89,7 @@ class Log:
 
         # Add message to log buffer
         if self.use_buffer:
-            if not self.__buffer.has_key(level):
+            if level not in self.__buffer:
                 self.__buffer[level] = [text]
             else:
                 self.__buffer[level].append(text)

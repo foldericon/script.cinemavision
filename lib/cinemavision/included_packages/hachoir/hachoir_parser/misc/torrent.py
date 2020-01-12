@@ -7,6 +7,8 @@ Status: To statufy
 Author: Christophe Gisquet <christophe.gisquet@free.fr>
 """
 
+from builtins import str
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     String, RawBytes)
@@ -128,7 +130,7 @@ class DictionaryItem(FieldSet):
 
 # Map first chunk byte => type
 TAGS = {'d': Dictionary, 'i': Integer, 'l': List}
-for index in xrange(0, 9+1):
+for index in range(0, 9+1):
     TAGS[str(index)] = TorrentString
 
 # Create an entry

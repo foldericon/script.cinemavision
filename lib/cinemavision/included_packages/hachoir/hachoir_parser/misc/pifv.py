@@ -5,6 +5,7 @@ Author: Alexandre Boeglin
 Creation date: 08 jul 2007
 """
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     UInt8, UInt16, UInt24, UInt32, UInt64, Enum,
@@ -72,11 +73,11 @@ EFI_FV_FILETYPE = {
     EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE: "Firmware volume image",
     EFI_FV_FILETYPE_FFS_PAD: "Pad File For FFS",
 }
-for x in xrange(0xc0, 0xe0):
+for x in range(0xc0, 0xe0):
     EFI_FV_FILETYPE[x] = "OEM File"
-for x in xrange(0xe0, 0xf0):
+for x in range(0xe0, 0xf0):
     EFI_FV_FILETYPE[x] = "Debug/Test File"
-for x in xrange(0xf1, 0x100):
+for x in range(0xf1, 0x100):
     EFI_FV_FILETYPE[x] = "Firmware File System Specific File"
 
 

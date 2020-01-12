@@ -1,9 +1,10 @@
-import kodiutil
-from kodiutil import T
+from __future__ import absolute_import
+from . import kodiutil
+from .kodiutil import T
 
 
 def clearDBWatchedStatus():
-    from cinemavision import database as DB
+    from .cinemavision import database as DB
 
     rows = DB.Trailers.update(watched=False).where(
         DB.Trailers.watched == 1
@@ -14,7 +15,7 @@ def clearDBWatchedStatus():
 
 
 def clearDBBrokenStatus():
-    from cinemavision import database as DB
+    from .cinemavision import database as DB
 
     rows = DB.Trailers.update(broken=False).where(
         DB.Trailers.broken == 1
@@ -45,7 +46,7 @@ def _pasteLog(logName='kodi.log'):
     import re
     import xbmc
     import xbmcgui
-    from pastebin_python import PastebinPython
+    from .pastebin_python import PastebinPython
 
     logPath = os.path.join(xbmc.translatePath('special://logpath').decode('utf-8'), logName)
 
@@ -126,8 +127,8 @@ def _pasteLog(logName='kodi.log'):
 
 def showQRCode(url):
     import os
-    import pyqrcode
-    import kodigui
+    from . import pyqrcode
+    from . import kodigui
     # from kodijsonrpc import rpc
 
     class ImageWindow(kodigui.BaseDialog):
@@ -178,7 +179,7 @@ def removeContentDatabase():
 
 
 def setDefaultSequence(setting):
-    import cvutil
+    from . import cvutil
 
     selection = cvutil.selectSequence()
     if not selection:
@@ -188,8 +189,8 @@ def setDefaultSequence(setting):
 
 
 def setScrapers():
-    import cvutil
-    import cinemavision
+    from . import cvutil
+    from . import cinemavision
 
     selected = [s.strip().lower() for s in kodiutil.getSetting('trailer.scrapers', '').split(',')]
     contentScrapers = cinemavision.util.contentScrapers()
@@ -211,7 +212,7 @@ def setScrapers():
 
 
 def testEventActions(action):
-    import cvutil
+    from . import cvutil
 
     path = None
 

@@ -39,6 +39,7 @@ Author: Victor Stinner
 Creation date: 24 september 2006
 """
 
+from builtins import str
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     FieldError, ParserError,

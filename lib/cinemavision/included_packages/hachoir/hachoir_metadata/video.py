@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 from hachoir_core.field import MissingField
 from hachoir_metadata.metadata import (registerExtractor,
     Metadata, RootMetadata, MultipleMetadata)
@@ -165,7 +167,7 @@ class FlvMetadata(MultipleMetadata):
         if "metadata/entry[1]" in flv:
             self.extractAMF(flv["metadata/entry[1]"])
         if self.has('duration'):
-            self.bit_rate = flv.size / timedelta2seconds(self.get('duration'))
+            self.bit_rate = old_div(flv.size, timedelta2seconds(self.get('duration')))
 
     @fault_tolerant
     def extractAudio(self, audio, meta):
@@ -289,7 +291,7 @@ class AsfMetadata(MultipleMetadata):
                 del data["IsVBR"]
 
             # Store data
-            for key, value in data.iteritems():
+            for key, value in data.items():
                 if key in self.EXT_DESC_TO_ATTR:
                     key = self.EXT_DESC_TO_ATTR[key]
                 else:

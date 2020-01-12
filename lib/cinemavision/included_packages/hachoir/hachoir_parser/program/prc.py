@@ -4,7 +4,11 @@ PRC (Palm resource) parser.
 Author: Sebastien Ponce
 Creation date: 29 october 2008
 """
+from __future__ import division
 
+from builtins import str
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     UInt16, UInt32, TimestampMac32,
@@ -64,7 +68,7 @@ class PRCFile(Parser):
         lens = []
         firstOne = True
         poff = 0
-        for index in xrange(self["header/num_records"].value):
+        for index in range(self["header/num_records"].value):
             r = ResourceHeader(self, "res_header[]")
             if firstOne:
                 firstOne = False
@@ -72,7 +76,7 @@ class PRCFile(Parser):
                 lens.append(r["offset"].value - poff)
             poff = r["offset"].value
             yield r
-        lens.append(self.size/8 - poff)
+        lens.append(old_div(self.size,8) - poff)
         yield UInt16(self, "placeholder", "Place holder bytes")
         for i in range(len(lens)):
             yield RawBytes(self, "res[]", lens[i], '"'+self["res_header["+str(i)+"]/name"].value+"\" Resource")

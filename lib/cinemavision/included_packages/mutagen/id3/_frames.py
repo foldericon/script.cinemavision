@@ -6,6 +6,10 @@
 # it under the terms of version 2 of the GNU General Public License as
 # published by the Free Software Foundation.
 
+from builtins import zip
+from builtins import bytes
+from builtins import str
+from builtins import object
 import zlib
 from struct import unpack
 

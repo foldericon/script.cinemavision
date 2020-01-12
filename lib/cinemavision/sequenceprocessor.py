@@ -1,14 +1,21 @@
+from __future__ import division
+from __future__ import absolute_import
+from builtins import zip
+from builtins import str
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import os
 import random
 import re
 import time
 import datetime
-import database as DB
-import sequence
-import scrapers
-import ratings
-import actions
-import util
+from . import database as DB
+from . import sequence
+from . import scrapers
+from . import ratings
+from . import actions
+from . import util
 
 TRAILER_FAIL_THRESHOLD = 10
 
@@ -470,7 +477,7 @@ class Feature(Video):
         if not self.runtime:
             return
 
-        return '{0} minutes'.format(self.runtime / 60)
+        return '{0} minutes'.format(old_div(self.runtime, 60))
 
 
 class Action(dict):
@@ -488,7 +495,7 @@ class Action(dict):
         self.processor.run()
 
 
-class FeatureHandler:
+class FeatureHandler(object):
     @DB.session
     def getRatingBumper(self, sItem, feature, image=False):
         try:
@@ -548,7 +555,7 @@ class FeatureHandler:
         return playables
 
 
-class TriviaHandler:
+class TriviaHandler(object):
     def __init__(self):
         pass
 
@@ -731,7 +738,7 @@ class TriviaHandler:
         ).where(DB.WatchedTrivia.WID == image.setID).execute()
 
 
-class TrailerHandler:
+class TrailerHandler(object):
     def __init__(self):
         self.caller = None
         self.sItem = None
@@ -988,7 +995,7 @@ class TrailerHandler:
         return [Video(path, volume=sItem.getLive('volume')).fromModule(sItem)]
 
 
-class VideoBumperHandler:
+class VideoBumperHandler(object):
     def __init__(self):
         self.caller = None
         self.handlers = {
@@ -1128,7 +1135,7 @@ class VideoBumperHandler:
             return []
 
 
-class AudioFormatHandler:
+class AudioFormatHandler(object):
     _atmosRegex = re.compile('[._ -]Atmos[._ -]', re.IGNORECASE)
     _dtsxRegex = re.compile('[._ -]DTS[._ -]X[._ -]', re.IGNORECASE)
 
@@ -1224,7 +1231,7 @@ class AudioFormatHandler:
         return []
 
 
-class ActionHandler:
+class ActionHandler(object):
     def __call__(self, caller, sItem):
         if not sItem.file:
             util.DEBUG_LOG('[{0}] NO PATH SET'.format(sItem.typeChar))
@@ -1235,7 +1242,7 @@ class ActionHandler:
         return [Action(processor)]
 
 
-class SequenceProcessor:
+class SequenceProcessor(object):
     def __init__(self, sequence_path, db_path=None, content_path=None):
         DB.initialize(db_path)
         self.pos = -1
@@ -1363,7 +1370,7 @@ class SequenceProcessor:
 
                 util.DEBUG_LOG('')
 
-    def next(self):
+    def __next__(self):
         if self.atEnd():
             return None
 

@@ -1,3 +1,4 @@
+from builtins import str
 from hachoir_core.i18n import getTerminalCharset, guessBytesCharset, _
 from hachoir_core.stream import InputIOStream, InputSubStream, InputStreamError
 from mutagen import FileOpener
@@ -12,14 +13,14 @@ def FileInputStream(filename, real_filename=None, **args):
     not able to convert filename to real unicode string (ie. you have to
     use unicode(name, 'replace') or unicode(name, 'ignore')).
     """
-    assert isinstance(filename, unicode)
+    assert isinstance(filename, str)
     if not real_filename:
         real_filename = filename
     try:
         inputio = FileOpener(real_filename, 'rb')
     except IOError as err:
         charset = getTerminalCharset()
-        errmsg = unicode(str(err), charset)
+        errmsg = str(str(err), charset)
         raise InputStreamError(_("Unable to open file %s: %s") % (filename, errmsg))
     source = "file:" + filename
     offset = args.pop("offset", 0)

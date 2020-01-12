@@ -14,6 +14,7 @@ Information:
 Author: Victor Stinner, Robert Xiao
 """
 
+from builtins import range
 from hachoir_core.error import HachoirError
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError, FieldError,
@@ -222,7 +223,7 @@ class QuantizationTable(FieldSet):
             coeff_type = UInt16
         else:
             coeff_type = UInt8
-        for index in xrange(64):
+        for index in range(64):
             natural = JPEG_NATURAL_ORDER[index]
             yield coeff_type(self, "coeff[%u]" % natural)
 
@@ -241,18 +242,18 @@ class HuffmanTable(FieldSet):
             0:"DC or Lossless Table",
             1:"AC Table"})
         yield Bits(self, "index", 4, "Huffman table destination identifier")
-        for i in xrange(1, 17):
+        for i in range(1, 17):
             yield UInt8(self, "count[%i]" % i, "Number of codes of length %i" % i)
         lengths = []
         remap = {}
-        for i in xrange(1, 17):
-            for j in xrange(self["count[%i]" % i].value):
+        for i in range(1, 17):
+            for j in range(self["count[%i]" % i].value):
                 field = UInt8(self, "value[%i][%i]" % (i, j), "Value of code #%i of length %i" % (j, i))
                 yield field
                 remap[len(lengths)] = field.value
                 lengths.append(i)
         self.tree = {}
-        for i,j in build_tree(lengths).iteritems():
+        for i,j in build_tree(lengths).items():
             self.tree[i] = remap[j]
 
 class DefineHuffmanTable(FieldSet):
@@ -455,7 +456,7 @@ class JpegChunk(FieldSet):
         0xCE: u"Differential progressive, arithmetic coding",
         0xCF: u"Differential lossless, arithmetic coding",
     }
-    for key, text in START_OF_FRAME.iteritems():
+    for key, text in START_OF_FRAME.items():
         TAG_INFO[key] = ("start_frame", "Start of frame (%s)" % text.lower(), StartOfFrame)
 
     def __init__(self, parent, name, description=None):
@@ -481,7 +482,7 @@ class JpegChunk(FieldSet):
             raise ParserError("JPEG: Invalid chunk header!")
         yield textHandler(UInt8(self, "type", "Type"), hexadecimal)
         tag = self["type"].value
-        if tag in [self.TAG_SOI, self.TAG_EOI] + range(0xD0, 0xD8): # D0 - D7 inclusive are the restart markers
+        if tag in [self.TAG_SOI, self.TAG_EOI] + list(range(0xD0, 0xD8)): # D0 - D7 inclusive are the restart markers
             return
         yield UInt16(self, "size", "Size")
         size = (self["size"].value - 2)

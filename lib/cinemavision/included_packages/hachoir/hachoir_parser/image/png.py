@@ -7,7 +7,11 @@ Documents:
 
 Author: Victor Stinner
 """
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
+from builtins import object
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, Fragment,
     ParserError, MissingField,
@@ -27,7 +31,7 @@ MAX_FILESIZE = 500 * 1024 * 1024 # 500 MB
 try:
     from zlib import decompressobj
 
-    class Gunzip:
+    class Gunzip(object):
         def __init__(self, stream):
             self.gzip = decompressobj()
 
@@ -67,7 +71,7 @@ def paletteParse(parent):
     if (size % 3) != 0:
         raise ParserError("Palette have invalid size (%s), should be 3*n!" % size)
     nb_colors = size // 3
-    for index in xrange(nb_colors):
+    for index in range(nb_colors):
         yield RGB(parent, "color[]")
 
 def paletteDescription(parent):
@@ -82,7 +86,7 @@ def gammaDescription(parent):
 
 def textParse(parent):
     yield CString(parent, "keyword", "Keyword", charset="ISO-8859-1")
-    length = parent["size"].value - parent["keyword"].size/8
+    length = parent["size"].value - old_div(parent["keyword"].size,8)
     if length:
         yield String(parent, "text", length, "Text", charset="ISO-8859-1")
 

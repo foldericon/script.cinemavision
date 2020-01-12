@@ -1,5 +1,6 @@
+from __future__ import absolute_import
 import xml
-import scraper
+from . import scraper
 from .. import _scrapers
 from ... import util
 from ... import ratings

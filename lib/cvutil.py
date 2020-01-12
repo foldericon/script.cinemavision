@@ -1,11 +1,16 @@
+from __future__ import division
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
+from past.utils import old_div
 import os
 import re
 import json
 import xbmc
-import kodiutil
-import cinemavision
+from . import kodiutil
+from . import cinemavision
 
-from kodiutil import T
+from .kodiutil import T
 
 DEFAULT_3D_RE = '(?i)3DSBS|3D.SBS|HSBS|H.SBS|H-SBS|[\. _]SBS[\. _]|FULL-SBS|FULL.SBS|FULLSBS|FSBS|HALF-SBS|' +\
     '3DTAB|3D.TAB|HTAB|H.TAB|3DOU|3D.OU|3D.HOU|[\. _]HOU[\. _]|[\. _]OU[\. _]|HALF-TAB|[\. _]TAB[\. _]'
@@ -272,7 +277,7 @@ def createSettingsRSDirs():
 
     defaultSystem = kodiutil.getSetting('rating.system.default', 'MPAA')
 
-    for system in cinemavision.ratings.RATINGS_SYSTEMS.values():
+    for system in list(cinemavision.ratings.RATINGS_SYSTEMS.values()):
         systemPaths = [os.path.join(base, system.name)]
         if system.name == defaultSystem:
             systemPaths.append(defaultPath)
@@ -310,7 +315,7 @@ def downloadDemoContent():
         with kodiutil.Progress(T(32506, 'Download'), T(32507, 'Downloading demo content')) as p:
             for block in response.iter_content(blockSize):
                 sofar += blockSize
-                pct = int((sofar / total) * 100)
+                pct = int((old_div(sofar, total)) * 100)
                 p.update(pct)
                 handle.write(block)
 
@@ -431,7 +436,7 @@ def ratingParser():
     return _RATING_PARSER
 
 
-class RatingParser:
+class RatingParser(object):
     SYSTEM_RATING_REs = {
         # 'MPAA': r'(?i)^Rated\s(?P<rating>Unrated|NR|PG-13|PG|G|R|NC-17)',
         'BBFC': r'(?i)^UK(?:\s+|:)(?P<rating>Uc|U|12A|12|PG|15|R18|18)',
@@ -478,7 +483,7 @@ class RatingParser:
             return 'UNKNOWN:NR'
 
         # Try a definite match
-        for system, ratingRE in self.SYSTEM_RATING_REs.items():
+        for system, ratingRE in list(self.SYSTEM_RATING_REs.items()):
             m = re.search(ratingRE, rating)
             if m:
                 return '{0}:{1}'.format(system, m.group('rating'))
@@ -493,7 +498,7 @@ class RatingParser:
                 return '{0}:{1}'.format(defaultSystem, m.group('rating'))
 
         # Try to extract rating from know ratings systems
-        for system, ratingRE in self.RATING_REs.items():
+        for system, ratingRE in list(self.RATING_REs.items()):
             m = re.search(ratingRE, rating)
             if m:
                 return m.group('rating')
@@ -503,7 +508,7 @@ class RatingParser:
 
 
 def multiSelect(options, default=False):
-    import kodigui
+    from . import kodigui
 
     class ModuleMultiSelectDialog(kodigui.MultiSelectDialog):
         xmlFile = 'script.cinemavision-multi-select-dialog.xml'
@@ -529,7 +534,7 @@ def multiSelect(options, default=False):
 
 
 def showText(heading, text):
-    import kodigui
+    from . import kodigui
 
     class TextView(kodigui.BaseDialog):
         xmlFile = 'script.cinemavision-text-dialog.xml'

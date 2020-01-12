@@ -1,20 +1,25 @@
+from __future__ import division
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import os
 import json
 
 import xbmcgui
 import xbmcvfs
 
-import seqattreditor
-import kodiutil
-import kodigui
+from . import seqattreditor
+from . import kodiutil
+from . import kodigui
 
-from kodiutil import T
+from .kodiutil import T
 
 kodiutil.LOG('Version: {0}'.format(kodiutil.ADDON.getAddonInfo('version')))
 
 kodiutil.checkAPILevel()
 
-import cvutil  # noqa E402
+from . import cvutil  # noqa E402
 
 from lib import cinemavision  # noqa E402
 
@@ -36,8 +41,8 @@ class ItemSettingsWindow(kodigui.BaseDialog):
         self.item = kwargs['item']
         self.pos = self.item.pos()
         seqSize = self.main.sequenceControl.size() - 1
-        self.leftOffset = int((self.pos + 1) / 2) - 1
-        self.rightOffset = int((seqSize - (self.pos + 1)) / 2)
+        self.leftOffset = int(old_div((self.pos + 1), 2)) - 1
+        self.rightOffset = int(old_div((seqSize - (self.pos + 1)), 2))
         self.modified = False
 
     def onFirstInit(self):
@@ -59,7 +64,7 @@ class ItemSettingsWindow(kodigui.BaseDialog):
                 name = '[COLOR FFFF0000]{0}[/COLOR]'.format(name)
 
             mli = kodigui.ManagedListItem(
-                name, e['limits'] != cinemavision.sequence.LIMIT_ACTION and unicode(sItem.getSettingDisplay(attr)) or '', data_source=attr
+                name, e['limits'] != cinemavision.sequence.LIMIT_ACTION and str(sItem.getSettingDisplay(attr)) or '', data_source=attr
             )
             mli.setProperty('name', e['name'])
             if sItem.getType(attr) == int:
@@ -299,7 +304,7 @@ class ItemSettingsWindow(kodigui.BaseDialog):
                 name = item.getProperty('name')
             item.setLabel(name)
 
-        item.setLabel2(unicode(sItem.getSettingDisplay(attr)))
+        item.setLabel2(str(sItem.getSettingDisplay(attr)))
 
         self.modified = True
 
@@ -657,7 +662,7 @@ class SequenceEditorWindow(kodigui.BaseWindow):
             if sItem.enabled and sItem._type == 'command':
                 if sItem.command == 'back':
                     pos = i.pos()
-                    all = range(1, (sItem.arg * 2) + 1)
+                    all = list(range(1, (sItem.arg * 2) + 1))
                     last = pos - all[-1]
 
                     i.setProperty('connect.end', '1')
@@ -981,7 +986,7 @@ class SequenceEditorWindow(kodigui.BaseWindow):
             cvutil.loadContent()
 
     def test(self):
-        import experience
+        from . import experience
 
         savePath = os.path.join(kodiutil.PROFILE_PATH, 'temp.cvseq')
         self._save(savePath, temp=True)

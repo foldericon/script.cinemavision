@@ -34,7 +34,7 @@ class StaticFieldSet(FieldSet):
             else:
                 return item_class.static_size(*item[1:])
         else:
-            assert isinstance(item_class.static_size, (int, long))
+            assert isinstance(item_class.static_size, int)
             return item_class.static_size
 
     def createFields(self):

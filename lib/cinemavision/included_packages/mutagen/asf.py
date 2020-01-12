@@ -10,6 +10,11 @@
 
 """Read and write ASF (Window Media Audio) files."""
 
+from builtins import next
+from builtins import zip
+from builtins import map
+from builtins import range
+from builtins import object
 __all__ = ["ASF", "Open"]
 
 import sys
@@ -577,7 +582,7 @@ class ContentDescriptionObject(BaseObject):
                 return b""
 
         texts = [render_text(x) for x in self.NAMES]
-        data = struct.pack("<HHHHH", *map(len, texts)) + b"".join(texts)
+        data = struct.pack("<HHHHH", *list(map(len, texts))) + b"".join(texts)
         return self.GUID + struct.pack("<Q", 24 + len(data)) + data
 
 
@@ -591,7 +596,7 @@ class ExtendedContentDescriptionObject(BaseObject):
         asf.extended_content_description_obj = self
         num_attributes, = struct.unpack("<H", data[0:2])
         pos = 2
-        for i in xrange(num_attributes):
+        for i in range(num_attributes):
             name_length, = struct.unpack("<H", data[pos:pos + 2])
             pos += 2
             name = data[pos:pos + name_length]
@@ -605,7 +610,7 @@ class ExtendedContentDescriptionObject(BaseObject):
             asf._tags.setdefault(self.GUID, []).append((name, attr))
 
     def render(self, asf):
-        attrs = asf.to_extended_content_description.items()
+        attrs = list(asf.to_extended_content_description.items())
         data = b"".join(attr.render(name) for (name, attr) in attrs)
         data = struct.pack("<QH", 26 + len(data), len(attrs)) + data
         return self.GUID + data
@@ -672,7 +677,7 @@ class MetadataObject(BaseObject):
         asf.metadata_obj = self
         num_attributes, = struct.unpack("<H", data[0:2])
         pos = 2
-        for i in xrange(num_attributes):
+        for i in range(num_attributes):
             (reserved, stream, name_length, value_type,
              value_length) = struct.unpack("<HHHHI", data[pos:pos + 12])
             pos += 12
@@ -688,7 +693,7 @@ class MetadataObject(BaseObject):
             asf._tags.setdefault(self.GUID, []).append((name, attr))
 
     def render(self, asf):
-        attrs = asf.to_metadata.items()
+        attrs = list(asf.to_metadata.items())
         data = b"".join([attr.render_m(name) for (name, attr) in attrs])
         return (self.GUID + struct.pack("<QH", 26 + len(data), len(attrs)) +
                 data)
@@ -703,7 +708,7 @@ class MetadataLibraryObject(BaseObject):
         asf.metadata_library_obj = self
         num_attributes, = struct.unpack("<H", data[0:2])
         pos = 2
-        for i in xrange(num_attributes):
+        for i in range(num_attributes):
             (language, stream, name_length, value_type,
              value_length) = struct.unpack("<HHHHI", data[pos:pos + 12])
             pos += 12
@@ -837,7 +842,7 @@ class ASF(FileType):
         self.size, self.num_objects = struct.unpack("<QL", header[16:28])
         self.objects = []
         self._tags = {}
-        for i in xrange(self.num_objects):
+        for i in range(self.num_objects):
             self.__read_object(fileobj)
 
         for guid in [ContentDescriptionObject.GUID,

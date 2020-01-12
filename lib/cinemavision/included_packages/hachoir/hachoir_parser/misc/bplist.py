@@ -15,6 +15,9 @@ Author: Robert Xiao
 Created: 2008-09-21
 """
 
+from builtins import zip
+from builtins import str
+from builtins import range
 from hachoir_parser import HachoirParser
 from hachoir_core.field import (RootSeekableFieldSet, FieldSet, Enum,
 Bits, GenericInteger, Float32, Float64, UInt8, UInt64, Bytes, NullBytes, RawBytes, String)
@@ -97,7 +100,7 @@ class BPListDict(FieldSet):
             yield BPListObjectRef(self, "valref[]")
 
     def createValue(self):
-        return zip(self.array('keyref'),self.array('valref'))
+        return list(zip(self.array('keyref'),self.array('valref')))
 
     def createDisplay(self):
         return '{' + ', '.join(['%s: %s'%(k.display,v.display) for k,v in self.value]) + '}'
@@ -229,7 +232,7 @@ class BPListObject(FieldSet):
 
     def createDisplay(self):
         if 'value' in self:
-            return unicode(self['value'].display)
+            return str(self['value'].display)
         elif self['marker_type'].value in [4,5,6]:
             return u''
         else:

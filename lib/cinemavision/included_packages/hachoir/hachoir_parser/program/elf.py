@@ -5,6 +5,8 @@ Author: Victor Stinner, Robert Xiao
 Creation date: 08 may 2006
 """
 
+from builtins import str
+from builtins import range
 from hachoir_parser import HachoirParser
 from hachoir_core.field import (RootSeekableFieldSet, FieldSet, ParserError, Bit, NullBits, RawBits,
     UInt8, UInt16, UInt32, UInt64, Enum,
@@ -315,7 +317,7 @@ class ElfFile(HachoirParser, RootSeekableFieldSet):
         yield ElfHeader(self, "header", "Header")
         self.is64bit = (self["header/class"].value == 2)
 
-        for index in xrange(self["header/phnum"].value):
+        for index in range(self["header/phnum"].value):
             if self.is64bit:
                 yield ProgramHeader64(self, "prg_header[]")
             else:
@@ -323,13 +325,13 @@ class ElfFile(HachoirParser, RootSeekableFieldSet):
 
         self.seekByte(self["header/shoff"].value, relative=False)
 
-        for index in xrange(self["header/shnum"].value):
+        for index in range(self["header/shnum"].value):
             if self.is64bit:
                 yield SectionHeader64(self, "section_header[]")
             else:
                 yield SectionHeader32(self, "section_header[]")
         
-        for index in xrange(self["header/shnum"].value):
+        for index in range(self["header/shnum"].value):
             field = self["section_header["+str(index)+"]"]
             if field['size'].value != 0:
                 self.seekByte(field['LMA'].value, relative=False)

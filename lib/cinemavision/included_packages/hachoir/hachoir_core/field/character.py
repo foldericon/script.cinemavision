@@ -2,6 +2,8 @@
 Character field class: a 8-bit character
 """
 
+from builtins import str
+from builtins import chr
 from hachoir_core.field import Bits
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.tools import makePrintable
@@ -20,7 +22,7 @@ class Character(Bits):
             self.absolute_address, 8, BIG_ENDIAN))
 
     def createRawDisplay(self):
-        return unicode(Bits.createValue(self))
+        return str(Bits.createValue(self))
 
     def createDisplay(self):
         return makePrintable(self.value, "ASCII", quote="'", to_unicode=True)

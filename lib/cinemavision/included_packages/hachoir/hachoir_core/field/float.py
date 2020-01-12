@@ -1,3 +1,4 @@
+from builtins import str
 from hachoir_core.field import Bit, Bits, FieldSet
 from hachoir_core.endian import BIG_ENDIAN, LITTLE_ENDIAN
 import struct
@@ -14,7 +15,7 @@ class FloatMantissa(Bits):
         return 1 + float(value) / (2 ** self.size)
 
     def createRawDisplay(self):
-        return unicode(Bits.createValue(self))
+        return str(Bits.createValue(self))
 
 class FloatExponent(Bits):
     def __init__(self, parent, name, size):
@@ -25,7 +26,7 @@ class FloatExponent(Bits):
         return Bits.createValue(self) - self.bias
 
     def createRawDisplay(self):
-        return unicode(self.value + self.bias)
+        return str(self.value + self.bias)
 
 def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
     size = 1 + mantissa_bits + exponent_bits

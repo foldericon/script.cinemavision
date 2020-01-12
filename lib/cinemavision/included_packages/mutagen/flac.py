@@ -20,6 +20,8 @@ Based off documentation available at
 http://flac.sourceforge.net/format.html
 """
 
+from builtins import range
+from builtins import object
 __all__ = ["FLAC", "Open", "delete"]
 
 import struct

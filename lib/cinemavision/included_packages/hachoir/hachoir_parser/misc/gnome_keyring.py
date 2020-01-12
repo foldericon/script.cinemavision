@@ -9,6 +9,8 @@ Author: Victor Stinner
 Creation date: 2008-04-09
 """
 
+from builtins import range
+from builtins import object
 from hachoir_core.tools import paddingSize
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
@@ -30,7 +32,7 @@ except ImportError:
 
 try:
     from Crypto.Cipher import AES
-    class DeflateStream:
+    class DeflateStream(object):
         def __init__(self, stream):
             hash_iterations = 1234
             password = "x" * 8
@@ -98,7 +100,7 @@ class Item(FieldSet):
         yield UInt32(self, "id")
         yield UInt32(self, "type")
         yield UInt32(self, "attr_count")
-        for index in xrange(self["attr_count"].value):
+        for index in range(self["attr_count"].value):
             yield Attribute(self, "attr[]")
 
     def createDescription(self):
@@ -107,7 +109,7 @@ class Item(FieldSet):
 class Items(FieldSet):
     def createFields(self):
         yield UInt32(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield Item(self, "item[]")
 
 class EncryptedItem(FieldSet):
@@ -117,13 +119,13 @@ class EncryptedItem(FieldSet):
         yield TimestampUnix64(self, "mtime")
         yield TimestampUnix64(self, "ctime")
         yield KeyringString(self, "reserved[]")
-        for index in xrange(4):
+        for index in range(4):
             yield UInt32(self, "reserved[]")
         yield UInt32(self, "attr_count")
-        for index in xrange(self["attr_count"].value):
+        for index in range(self["attr_count"].value):
             yield Attribute(self, "attr[]")
         yield UInt32(self, "acl_count")
-        for index in xrange(self["acl_count"].value):
+        for index in range(self["acl_count"].value):
             yield ACL(self, "acl[]")
 #        size = 8 # paddingSize((self.stream.size - self.current_size) // 8, 16)
 #        if size:
@@ -194,7 +196,7 @@ class GnomeKeyring(Parser):
 
 def generate_key(password, salt, hash_iterations):
     sha = sha256(password+salt)
-    for index in xrange(hash_iterations-1):
+    for index in range(hash_iterations-1):
         sha = sha256(sha)
     return sha[:16], sha[16:]
 

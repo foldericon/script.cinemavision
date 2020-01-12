@@ -3,7 +3,10 @@ RPM archive parser.
 
 Author: Victor Stinner, 1st December 2005.
 """
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, UInt64, Enum,
@@ -49,7 +52,7 @@ class ItemContent(FieldSet):
                 args = (self, "value[]")
             else:
                 args = (self, "value")
-        for index in xrange(count):
+        for index in range(count):
             yield cls(*args)
 
 class Item(FieldSet):
@@ -206,14 +209,14 @@ class PropertySet(FieldSet):
         items.sort( sortRpmItem )
 
         # Read item content
-        start = self.current_size/8
+        start = old_div(self.current_size,8)
         for item in items:
             offset = item["offset"].value
-            diff = offset - (self.current_size/8 - start)
+            diff = offset - (old_div(self.current_size,8) - start)
             if 0 < diff:
                 yield NullBytes(self, "padding[]", diff)
             yield ItemContent(self, "content[]", item)
-        size = start + self["size"].value - self.current_size/8
+        size = start + self["size"].value - old_div(self.current_size,8)
         if 0 < size:
             yield NullBytes(self, "padding[]", size)
 

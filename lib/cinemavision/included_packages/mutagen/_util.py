@@ -12,6 +12,11 @@ You should not rely on the interfaces here being stable. They are
 intended for internal use in Mutagen only.
 """
 
+from builtins import bytes
+from builtins import zip
+from builtins import str
+from builtins import range
+from builtins import object
 import struct
 import codecs
 
@@ -103,7 +108,7 @@ class DictMixin(object):
     """
 
     def __iter__(self):
-        return iter(self.keys())
+        return iter(list(self.keys()))
 
     def __has_key(self, key):
         try:
@@ -119,19 +124,19 @@ class DictMixin(object):
     __contains__ = __has_key
 
     if PY2:
-        iterkeys = lambda self: iter(self.keys())
+        iterkeys = lambda self: iter(list(self.keys()))
 
     def values(self):
-        return [self[k] for k in self.keys()]
+        return [self[k] for k in list(self.keys())]
 
     if PY2:
-        itervalues = lambda self: iter(self.values())
+        itervalues = lambda self: iter(list(self.values()))
 
     def items(self):
-        return list(zip(self.keys(), self.values()))
+        return list(zip(list(self.keys()), list(self.values())))
 
     if PY2:
-        iteritems = lambda s: iter(s.items())
+        iteritems = lambda s: iter(list(s.items()))
 
     def clear(self):
         for key in list(self.keys()):
@@ -151,7 +156,7 @@ class DictMixin(object):
         return value
 
     def popitem(self):
-        for key in self.keys():
+        for key in list(self.keys()):
             break
         else:
             raise KeyError("dictionary is empty")
@@ -163,7 +168,7 @@ class DictMixin(object):
             other = {}
 
         try:
-            for key, value in other.items():
+            for key, value in list(other.items()):
                 self.__setitem__(key, value)
         except AttributeError:
             for key, value in other:
@@ -183,18 +188,18 @@ class DictMixin(object):
             return default
 
     def __repr__(self):
-        return repr(dict(self.items()))
+        return repr(dict(list(self.items())))
 
     def __eq__(self, other):
-        return dict(self.items()) == other
+        return dict(list(self.items())) == other
 
     def __lt__(self, other):
-        return dict(self.items()) < other
+        return dict(list(self.items())) < other
 
     __hash__ = object.__hash__
 
     def __len__(self):
-        return len(self.keys())
+        return len(list(self.keys()))
 
 
 class DictProxy(DictMixin):
@@ -212,7 +217,7 @@ class DictProxy(DictMixin):
         del(self.__dict[key])
 
     def keys(self):
-        return self.__dict.keys()
+        return list(self.__dict.keys())
 
 
 def _fill_cdata(cls):
@@ -526,7 +531,7 @@ class BitReader(object):
                 raise BitReaderError("not enough data")
             return data
 
-        return bytes(bytearray(self.bits(8) for _ in xrange(count)))
+        return bytes(bytearray(self.bits(8) for _ in range(count)))
 
     def skip(self, count):
         """Skip `count` bits.

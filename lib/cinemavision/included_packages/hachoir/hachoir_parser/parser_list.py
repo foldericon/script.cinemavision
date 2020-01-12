@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import str
+from builtins import object
 import re
 import types
 from hachoir_core.error import error
@@ -22,7 +25,7 @@ class ParserList(object):
         elif name == "min_size":
             return - value < 0 or "Invalid minimum size (min_size)"
         elif name == "description":
-            return isinstance(value, (str, unicode)) and bool(value) or "Invalid description"
+            return isinstance(value, str) and bool(value) or "Invalid description"
         elif name == "category":
             if value not in self.VALID_CATEGORY:
                 return "Invalid category: %r" % value
@@ -54,7 +57,7 @@ class ParserList(object):
         if not isinstance(mimes, tuple):
             return "MIME type is not a tuple"
         for mime in mimes:
-            if not isinstance(mime, unicode):
+            if not isinstance(mime, str):
                 return "MIME type %r is not an unicode string" % mime
 
         return ""
@@ -67,7 +70,7 @@ class ParserList(object):
             return
 
         _tags = []
-        for tag in tags.iteritems():
+        for tag in tags.items():
             tag = self.translate(*tag)
             if isinstance(tag, tuple):
                 _tags.append(tag)
@@ -139,7 +142,7 @@ class ParserList(object):
 
         # Create parser list sorted by module
         bycategory = self.bytag["category"]
-        for category in sorted(bycategory.iterkeys()):
+        for category in sorted(bycategory.keys()):
             if format == "one_line":
                 parser_list = [ parser.PARSER_TAGS["id"] for parser in bycategory[category] ]
                 parser_list.sort()

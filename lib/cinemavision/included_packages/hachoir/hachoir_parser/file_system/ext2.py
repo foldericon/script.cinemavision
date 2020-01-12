@@ -9,7 +9,11 @@ Sources:
 - Analysis of the Ext2fs structure
   http://www.nondot.org/sabre/os/files/FileSystems/ext2fs/
 """
+from __future__ import division
 
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt16, UInt32,
@@ -18,7 +22,7 @@ from hachoir_core.tools import (alignValue,
     humanDuration, humanFilesize)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import textHandler
-from itertools import izip
+
 
 class DirectoryEntry(FieldSet):
     file_type = {
@@ -109,10 +113,10 @@ class Inode(FieldSet):
             ("group_read", "group_write", "group_exec"),
             ("other_read", "other_write", "other_exec"))
         letters = "rwx"
-        mode = [ "-"  for index in xrange(10) ]
+        mode = [ "-"  for index in range(10) ]
         index = 1
-        for loop in xrange(3):
-            for name, letter in izip(names[loop], letters):
+        for loop in range(3):
+            for name, letter in zip(names[loop], letters):
                 if self[name].value:
                     mode[index] = letter
                 index += 1
@@ -148,7 +152,7 @@ class Inode(FieldSet):
         yield UInt32(self, "blocks", "Number of blocks")
         yield UInt32(self, "flags", "Flags")
         yield NullBytes(self, "reserved[]", 4, "Reserved")
-        for index in xrange(15):
+        for index in range(15):
             yield UInt32(self, "block[]")
         yield UInt32(self, "version", "Version")
         yield UInt32(self, "file_acl", "File ACL")
@@ -180,7 +184,7 @@ class Bitmap(FieldSet):
         self.start = 1+start
 
     def createFields(self):
-        for index in xrange(self._size):
+        for index in range(self._size):
             yield Bit(self, "item[]", "Item %s" % (self.start+index))
 
 BlockBitmap = Bitmap
@@ -289,7 +293,7 @@ class SuperBlock(FieldSet):
         if self._group_count is None:
             # Calculate number of groups
             blocks_per_group = self["blocks_per_group"].value
-            self._group_count = (self["blocks_count"].value - self["first_data_block"].value + (blocks_per_group - 1)) / blocks_per_group
+            self._group_count = old_div((self["blocks_count"].value - self["first_data_block"].value + (blocks_per_group - 1)), blocks_per_group)
         return self._group_count
     group_count = property(_getGroupCount)
 
@@ -328,7 +332,7 @@ class Group(FieldSet):
         self.uniq_id = index
 
     def createDescription(self):
-        desc = "Group %s: %s" % (self.uniq_id, humanFilesize(self.size/8))
+        desc = "Group %s: %s" % (self.uniq_id, humanFilesize(old_div(self.size,8)))
         if "superblock_copy" in self:
             desc += " (with superblock copy)"
         return desc
@@ -375,7 +379,7 @@ class Group(FieldSet):
         yield InodeTable(self, "inode_table", inode_index, inode_count)
 
         # Add padding if needed
-        addr = min(self.parent.size / 8,
+        addr = min(old_div(self.parent.size, 8),
             (self.uniq_id+1) * superblock["blocks_per_group"].value * block_size)
         yield self.seekByte(addr, "data", relative=False)
 
@@ -427,7 +431,7 @@ class EXT2_FS(Parser):
         self.block_size = 1024 << superblock["log_block_size"].value # in bytes
 
         # Read groups' descriptor
-        field = self.seekByte(((1023 + superblock.size/8) / self.block_size + 1) * self.block_size, null=True)
+        field = self.seekByte((old_div((1023 + old_div(superblock.size,8)), self.block_size) + 1) * self.block_size, null=True)
         if field:
             yield field
         groups = GroupDescriptors(self, "group_desc", superblock.group_count)

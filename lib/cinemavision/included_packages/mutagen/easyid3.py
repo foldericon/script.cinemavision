@@ -12,6 +12,7 @@ EasyID3 is a wrapper around mutagen.id3.ID3 to make ID3 tags appear
 more like Vorbis or APEv2 tags.
 """
 
+from past.builtins import basestring
 import mutagen.id3
 
 from ._compat import iteritems, text_type, PY2
@@ -221,7 +222,7 @@ class EasyID3(DictMixin, Metadata):
 
     def keys(self):
         keys = []
-        for key in self.Get.keys():
+        for key in list(self.Get.keys()):
             if key in self.List:
                 keys.extend(self.List[key](self.__id3, key))
             elif key in self:

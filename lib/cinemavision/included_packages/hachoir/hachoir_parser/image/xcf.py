@@ -8,7 +8,9 @@ CVS online:
 
 Author: Victor Stinner
 """
+from __future__ import division
 
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (StaticFieldSet, FieldSet, ParserError,
     UInt8, UInt32, Enum, Float32, String, PascalString32, RawBytes)
@@ -98,13 +100,13 @@ class XcfLevel(FieldSet):
         if offset == 0:
             return
         data_offsets = []
-        while (self.absolute_address + self.current_size)/8 < offset:
+        while old_div((self.absolute_address + self.current_size),8) < offset:
             chunk = UInt32(self, "data_offset[]", "Data offset")
             yield chunk
             if chunk.value == 0:
                 break
             data_offsets.append(chunk)
-        if (self.absolute_address + self.current_size)/8 != offset:
+        if old_div((self.absolute_address + self.current_size),8) != offset:
             raise ParserError("Problem with level offset.")
         previous = offset
         for chunk in data_offsets:

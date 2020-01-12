@@ -1,13 +1,16 @@
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
 import time
 import calendar
 
 import xbmcgui
-import kodigui
-import kodiutil
-import cvutil
-import cinemavision
+from . import kodigui
+from . import kodiutil
+from . import cvutil
+from . import cinemavision
 
-from kodijsonrpc import rpc
+from .kodijsonrpc import rpc
 
 cvutil.ratingParser()
 
@@ -271,16 +274,16 @@ class SeqAttrEditorDialog(kodigui.BaseDialog):
         return rating
 
     def getDate(self, start=None, remove=None, single=False, disp='', prefix=''):
-        month = self.chooseFromList(range(1, 13), 'Month', disp, [u'{0}{1}'.format(prefix, calendar.month_abbr[m]) for m in range(1, 13)])
+        month = self.chooseFromList(list(range(1, 13)), 'Month', disp, [u'{0}{1}'.format(prefix, calendar.month_abbr[m]) for m in range(1, 13)])
         if month is None:
             return None
 
         if month in [4, 6, 9, 11]:
-            dlist = range(1, 31)
+            dlist = list(range(1, 31))
         elif month == 2:
-            dlist = range(1, 30)
+            dlist = list(range(1, 30))
         else:
-            dlist = range(1, 32)
+            dlist = list(range(1, 32))
 
         monthName = calendar.month_abbr[month]
         day = self.chooseFromList(dlist, 'Day', disp, [u'{0}{1} {2}'.format(prefix, monthName, d) for d in dlist])
@@ -294,7 +297,7 @@ class SeqAttrEditorDialog(kodigui.BaseDialog):
         if single and remove:
             hours = [h for h in range(24) if [[h, None]] not in remove]
         else:
-            hours = range(24)
+            hours = list(range(24))
         hour = self.chooseFromList(hours, 'Hour', disp, [u'{0}{1:02d}'.format(prefix, h) for h in hours])
         if hour is None:
             return None
@@ -302,7 +305,7 @@ class SeqAttrEditorDialog(kodigui.BaseDialog):
         if single:
             return [hour, None]
 
-        minute = self.chooseFromList(range(60), 'Minute', disp, [u'{0}{1:02d}:{2:02d}'.format(prefix, hour, m) for m in range(60)])
+        minute = self.chooseFromList(list(range(60)), 'Minute', disp, [u'{0}{1:02d}:{2:02d}'.format(prefix, hour, m) for m in range(60)])
         if minute is None:
             return None
 

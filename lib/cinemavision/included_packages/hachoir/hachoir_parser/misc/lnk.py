@@ -21,7 +21,12 @@ Changes:
   2007-03-15 - Victor Stinner
     * Creation of the parser
 """
+from __future__ import division
 
+from builtins import str
+from builtins import chr
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     CString, String,
@@ -415,11 +420,11 @@ class ExtraInfo(FieldSet):
             else: # Custom Icon Details
                 object_name="icon_path"
             yield CString(self, object_name, "Data (ASCII format)", charset="ASCII")
-            remaining = self["length"].value - self.current_size/8 - 260*2 # 260*2 = size of next part
+            remaining = self["length"].value - old_div(self.current_size,8) - 260*2 # 260*2 = size of next part
             if remaining:
                 yield RawBytes(self, "slack_space[]", remaining, "Data beyond end of string")
             yield CString(self, object_name+'_unicode', "Data (Unicode format)", charset="UTF-16-LE", truncate="\0")
-            remaining = self["length"].value - self.current_size/8
+            remaining = self["length"].value - old_div(self.current_size,8)
             if remaining:
                 yield RawBytes(self, "slack_space[]", remaining, "Data beyond end of string")
 
@@ -452,7 +457,7 @@ class ExtraInfo(FieldSet):
             yield UInt32(self, "history_size", "Size of the history buffer (in lines)")
             yield UInt32(self, "history_count", "Number of history buffers (each process gets one up to this limit)")
             yield Enum(UInt32(self, "history_no_dup", "Automatically eliminate duplicate lines in the history buffer?"), self.BOOL_ENUM)
-            for index in xrange(16):
+            for index in range(16):
                 yield ColorRef(self, "color[]")
 
         elif self["signature"].value == 0xA0000004:
@@ -460,7 +465,7 @@ class ExtraInfo(FieldSet):
             yield UInt32(self, "codepage", "Console's code page")
 
         else:
-            yield RawBytes(self, "raw", self["length"].value-self.current_size/8)
+            yield RawBytes(self, "raw", self["length"].value-old_div(self.current_size,8))
 
     def createDescription(self):
         if self["length"].value:
@@ -506,11 +511,11 @@ def text_hot_key(field):
     assert hasattr(field, "value")
     val=field.value
     if 0x30 <= val <= 0x39:
-        return unichr(val)
+        return chr(val)
     elif 0x41 <= val <= 0x5A:
-        return unichr(val)
+        return chr(val)
     elif 0x60 <= val <= 0x69:
-        return u'Numpad %c' % unichr(val-0x30)
+        return u'Numpad %c' % chr(val-0x30)
     elif 0x70 <= val <= 0x87:
         return 'F%i'%(val-0x6F)
     elif val in HOT_KEYS:

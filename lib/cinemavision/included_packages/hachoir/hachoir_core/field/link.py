@@ -1,3 +1,8 @@
+from __future__ import division
+from builtins import next
+from builtins import str
+from past.utils import old_div
+from builtins import object
 from hachoir_core.field import Field, FieldSet, ParserError, Bytes, MissingField
 from hachoir_core.stream import FragmentedStream
 
@@ -24,7 +29,7 @@ class Link(Field):
         return target._getField(name, const)
 
 
-class Fragments:
+class Fragments(object):
     def __init__(self, first):
         self.first = first
 
@@ -33,7 +38,7 @@ class Fragments:
         while fragment is not None:
             data = fragment.getData()
             yield data and data.size
-            fragment = fragment.next
+            fragment = fragment.__next__
 
 
 class Fragment(FieldSet):
@@ -105,5 +110,5 @@ class Fragment(FieldSet):
     def createFields(self):
         if self._size is None:
             self._size = self._getSize()
-        yield Bytes(self, "data", self._size/8)
+        yield Bytes(self, "data", old_div(self._size,8))
 

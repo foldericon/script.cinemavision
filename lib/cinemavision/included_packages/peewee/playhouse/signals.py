@@ -1,6 +1,7 @@
 """
 Provide django-style hooks for model events.
 """
+from builtins import object
 from peewee import Model as _Model
 
 

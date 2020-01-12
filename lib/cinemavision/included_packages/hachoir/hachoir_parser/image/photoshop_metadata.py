@@ -3,7 +3,9 @@
 References:
 - http://www.scribd.com/doc/32900475/Photoshop-File-Formats
 """
+from __future__ import division
 
+from past.utils import old_div
 from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, Float32, Enum,
     SubFile, String, CString, PascalString8,
@@ -166,6 +168,6 @@ class PhotoshopMetadata(FieldSet):
             while not self.eof:
                 yield Photoshop8BIM(self, "item[]")
         else:
-            size = (self._size - self.current_size) / 8
+            size = old_div((self._size - self.current_size), 8)
             yield RawBytes(self, "rawdata", size)
 

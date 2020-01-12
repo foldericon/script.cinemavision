@@ -1,11 +1,16 @@
+from __future__ import division
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
+from past.utils import old_div
 import os
 import re
 from xml.etree import ElementTree as ET
 
-import util
+from . import util
 import mutagen
 import hachoir
-import database as DB
+from . import database as DB
 import datetime
 
 try:
@@ -36,7 +41,7 @@ CONTENT_3D_RE = '\([^\)]*3D[^\)]*\)'
 
 
 def getBumperDir(ID):
-    for dirname, tid in TYPE_IDS.items():
+    for dirname, tid in list(TYPE_IDS.items()):
         if tid == ID:
             break
     else:
@@ -45,7 +50,7 @@ def getBumperDir(ID):
     return ('Video Bumpers', dirname)
 
 
-class UserContent:
+class UserContent(object):
     _tree = (
         ('Audio Format Bumpers', (
             'Auro-3D',
@@ -220,7 +225,7 @@ class UserContent:
 
         total = float(len(paths))
         for ct, sub in enumerate(paths):
-            pct = 20 + int((ct / total) * 20)
+            pct = 20 + int((old_div(ct, total)) * 20)
             if not self._callback(pct=pct):
                 break
             path = os.path.join(basePath, sub)
@@ -261,7 +266,7 @@ class UserContent:
         total = float(len(paths))
 
         for ct, sub in enumerate(paths):
-            pct = pct_start + int((ct / total) * 20)
+            pct = pct_start + int((old_div(ct, total)) * 20)
             if not self._callback(pct=pct):
                 break
 
@@ -327,11 +332,11 @@ class UserContent:
             )
 
     def loadRatingSystem(self, path):
-        import ratings
+        from . import ratings
         with util.vfs.File(path, 'r') as f:
             system = ratings.addRatingSystemFromXML(f.read())
 
-        for context, regEx in system.regEx.items():
+        for context, regEx in list(system.regEx.items()):
             DB.RatingSystem.get_or_create(
                 name=system.name,
                 context=context,
@@ -355,7 +360,7 @@ class UserContent:
             util.ERROR()
 
     def _scrapeContent(self):
-        import scrapers
+        from . import scrapers
         scrapers.setContentPath(self._contentDirectory)
 
         for stype, source in util.contentScrapers():
@@ -399,7 +404,7 @@ class UserContent:
                                 is3D=t.is3D,
                                 verified=True
                             )
-                        pct = int((allct / total) * 100)
+                        pct = int((old_div(allct, total)) * 100)
                         self._callback(t.title, pct=pct)
 
                     removed = 0
@@ -421,7 +426,7 @@ class UserContent:
                     util.DEBUG_LOG(' - No new {0} trailers added to database'.format(source))
 
 
-class MusicHandler:
+class MusicHandler(object):
     def __init__(self, owner=None):
         self.owner = owner
 
@@ -431,7 +436,7 @@ class MusicHandler:
 
         total = float(len(names))
         for ct, file in enumerate(names):
-            pct = int((ct / total) * 20)
+            pct = int((old_div(ct, total)) * 20)
             if not self.owner._callback(pct=pct):
                 break
             self.addSongs(basePath, file)
@@ -485,7 +490,7 @@ class MusicHandler:
         return cleaned
 
 
-class TriviaDirectoryHandler:
+class TriviaDirectoryHandler(object):
     _formatXML = 'slides.xml'
     _ratingNA = ('slide', 'rating')
     _questionNA = ('question', 'format')
@@ -593,7 +598,7 @@ class TriviaDirectoryHandler:
             elif ttype == 'c':
                 trivia[name]['c'][clueCount] = path
 
-        for name, data in trivia.items():
+        for name, data in list(trivia.items()):
             questionPath = data['q']
             answerPath = data['a']
 

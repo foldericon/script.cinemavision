@@ -9,6 +9,7 @@ Author: Victor Stinner
 Creation date: 13 january 2007
 """
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError, MissingField,
     UInt8, Enum, Bit, Bits, RawBytes)
@@ -78,7 +79,7 @@ class MPEG_TS(Parser):
         sync = self.stream.searchBytes("\x47", 0, 204*8)
         if sync is None:
             return "Unable to find synchronization byte"
-        for index in xrange(5):
+        for index in range(5):
             try:
                 packet = self["packet[%u]" % index]
             except (ParserError, MissingField):

@@ -7,6 +7,7 @@ Author: Cyril Zorin
 Creation date: 28 september 2006
 """
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     UInt32, Int32, String, Float32,
@@ -30,7 +31,7 @@ class Vector(FieldSet):
             self._size = item_size * self.count
 
     def createFields(self):
-        for index in xrange(self.count):
+        for index in range(self.count):
             yield self.type(self, self.ename, self.edesc)
 
 class Face(FieldSet):
@@ -104,7 +105,7 @@ class Mesh(FieldSet):
 class Geoset(FieldSet):
     def createFields(self):
         yield UInt32(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield Mesh(self, "mesh[]")
 
     def createDescription(self):
@@ -139,7 +140,7 @@ class Node(FieldSet):
         yield Float32(self, "pitch")
         yield Float32(self, "yaw")
         yield Float32(self, "roll")
-        for index in xrange(4):
+        for index in range(4):
             yield Vertex(self, "unknown_vertex[]")
         if self["parent_offset"].value != 0:
             yield UInt32(self, "parent_id")
@@ -154,7 +155,7 @@ class Node(FieldSet):
 class Nodes(FieldSet):
     def createFields(self):
         yield UInt32(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield Node(self, "node[]")
 
     def createDescription(self):
@@ -168,7 +169,7 @@ class Materials(FieldSet):
 
     def createFields(self):
         yield UInt32(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield String(self, "filename[]", 32, "Material file name", strip="\0")
 
     def createDescription(self):
@@ -201,7 +202,7 @@ class File3do(Parser):
         yield String(self, "model_name", 32, "model file name", strip="\0")
         yield RawBytes(self, "unknown[]", 4)
         yield UInt32(self, "ngeosets")
-        for index in xrange(self["ngeosets"].value):
+        for index in range(self["ngeosets"].value):
             yield Geoset(self, "geoset[]")
         yield RawBytes(self, "unknown[]", 4)
         yield Nodes(self, "nodes")

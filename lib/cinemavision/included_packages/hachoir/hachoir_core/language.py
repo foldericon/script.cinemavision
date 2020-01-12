@@ -1,6 +1,9 @@
+from past.builtins import cmp
+from builtins import str
+from builtins import object
 from hachoir_core.iso639 import ISO639_2
 
-class Language:
+class Language(object):
     def __init__(self, code):
         code = str(code)
         if code not in ISO639_2:
@@ -19,5 +22,5 @@ class Language:
        return self.__unicode__()
 
     def __repr__(self):
-        return "<Language '%s', code=%r>" % (unicode(self), self.code)
+        return "<Language '%s', code=%r>" % (str(self), self.code)
 

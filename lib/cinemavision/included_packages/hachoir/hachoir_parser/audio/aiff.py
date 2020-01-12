@@ -5,6 +5,7 @@ Author: Victor Stinner
 Creation: 27 december 2006
 """
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     UInt16, UInt32, Float80, TimestampMac32,
@@ -37,7 +38,7 @@ def parseID3(self):
 
 def parseComment(self):
     yield UInt16(self, "nb_comment")
-    for index in xrange(self["nb_comment"].value):
+    for index in range(self["nb_comment"].value):
         yield Comment(self, "comment[]")
 
 def parseCommon(self):

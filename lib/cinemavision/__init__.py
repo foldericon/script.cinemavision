@@ -1,10 +1,11 @@
-import included_packages
+from __future__ import absolute_import
+from . import included_packages
 
-import util
-import content
-import sequence
-import actions
-import sequenceprocessor
+from . import util
+from . import content
+from . import sequence
+from . import actions
+from . import sequenceprocessor
 
 
 def init(debug, progress=None, localizer=None, tags_3D_regex=''):

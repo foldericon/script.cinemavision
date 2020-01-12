@@ -2,6 +2,8 @@
 Parent of all (field) classes in Hachoir: Field.
 """
 
+from builtins import str
+from builtins import range
 from hachoir_core.compatibility import reversed
 from hachoir_core.stream import InputFieldStream
 from hachoir_core.error import HachoirError, HACHOIR_ERRORS
@@ -90,7 +92,7 @@ class Field(Logger):
                     self._description = makePrintable(
                         self._description, "ISO-8859-1", to_unicode=True)
             except HACHOIR_ERRORS as err:
-                self.error("Error getting description: " + unicode(err))
+                self.error("Error getting description: " + str(err))
                 self._description = ""
         return self._description
     description = property(_getDescription,
@@ -112,7 +114,7 @@ class Field(Logger):
         try:
             value = self.createValue()
         except HACHOIR_ERRORS as err:
-            self.error(_("Unable to create value: %s") % unicode(err))
+            self.error(_("Unable to create value: %s") % str(err))
             value = None
         self._getValue = lambda: value
         return value
@@ -123,7 +125,7 @@ class Field(Logger):
     parent = property(_getParent, doc="Parent of this field")
 
     def createDisplay(self):
-        return unicode(self.value)
+        return str(self.value)
     def _getDisplay(self):
         if not hasattr(self, "_Field__display"):
             try:
@@ -140,7 +142,7 @@ class Field(Logger):
         if isinstance(value, str):
             return makePrintable(value, "ASCII", to_unicode=True)
         else:
-            return unicode(value)
+            return str(value)
     def _getRawDisplay(self):
         if not hasattr(self, "_Field__raw_display"):
             try:
@@ -199,7 +201,7 @@ class Field(Logger):
         if name.strip("."):
             return None
         field = self
-        for index in xrange(1, len(name)):
+        for index in range(1, len(name)):
             field = field._parent
             if field is None:
                 break
@@ -250,7 +252,7 @@ class Field(Logger):
         cis = self._createInputStream
         self._createInputStream = lambda **args: createInputStream(cis, **args)
 
-    def __nonzero__(self):
+    def __bool__(self):
         """
         Method called by code like "if field: (...)".
         Always returns True

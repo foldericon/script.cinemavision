@@ -99,6 +99,8 @@ Dropping an index:
     # Specify the index name.
     migrate(migrator.drop_index('story', 'story_pub_date_status'))
 """
+from builtins import zip
+from builtins import object
 from collections import namedtuple
 import functools
 import re
@@ -480,7 +482,7 @@ class SqliteMigrator(SchemaMigrator):
                     original_column_names.append(column_name)
 
         # Create a mapping of original columns to new columns.
-        original_to_new = dict(zip(original_column_names, new_column_names))
+        original_to_new = dict(list(zip(original_column_names, new_column_names)))
         new_column = original_to_new.get(column_to_update)
 
         fk_filter_fn = lambda column_def: column_def

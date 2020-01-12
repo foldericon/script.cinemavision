@@ -14,7 +14,11 @@ algorithms. Stream versions 4 through 7 are supported.
 
 For more information, see http://www.musepack.net/.
 """
+from __future__ import division
 
+from builtins import map
+from builtins import range
+from past.utils import old_div
 __all__ = ["Musepack", "Open", "delete"]
 
 import struct
@@ -44,7 +48,7 @@ def _parse_sv8_int(fileobj, limit=9):
     """
 
     num = 0
-    for i in xrange(limit):
+    for i in range(limit):
         c = fileobj.read(1)
         if len(c) != 1:
             raise EOFError
@@ -63,7 +67,7 @@ def _calc_sv8_gain(gain):
 
 
 def _calc_sv8_peak(peak):
-    return (10 ** (peak / (256.0 * 20.0)) / 65535.0)
+    return (10 ** (old_div(peak, (256.0 * 20.0))) / 65535.0)
 
 
 class MusepackInfo(StreamInfo):
@@ -111,7 +115,7 @@ class MusepackInfo(StreamInfo):
 
         if not self.bitrate and self.length != 0:
             fileobj.seek(0, 2)
-            self.bitrate = int(round(fileobj.tell() * 8 / self.length))
+            self.bitrate = int(round(old_div(fileobj.tell() * 8, self.length)))
 
     def __parse_sv8(self, fileobj):
         # SV8 http://trac.musepack.net/trac/wiki/SV8Specification

@@ -10,6 +10,7 @@ http://technet.microsoft.com/en-us/library/bb490996.aspx
 """
 
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, RootSeekableFieldSet,
     CString, String, PascalString16,
@@ -164,5 +165,5 @@ class MSTaskFile(Parser, RootSeekableFieldSet):
         elif self["ReservedDataSize"].value:
             yield RawBytes(self, "Reserved", self["ReservedDataSize"].value)
         yield UInt16(self, "TriggerCount", "size of the array of triggers")
-        for i in xrange(self["TriggerCount"].value):
+        for i in range(self["TriggerCount"].value):
             yield TaskTrigger(self, "Trigger[]")

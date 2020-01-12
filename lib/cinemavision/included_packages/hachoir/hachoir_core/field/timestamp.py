@@ -1,3 +1,4 @@
+from builtins import str
 from hachoir_core.tools import (humanDatetime, humanDuration,
     timestampUNIX, timestampMac32, timestampUUID60,
     timestampWin64, durationWin64)
@@ -13,9 +14,9 @@ class GenericTimestamp(Bits):
 
     def createRawDisplay(self):
         value = Bits.createValue(self)
-        return unicode(value)
+        return str(value)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return Bits.createValue(self) != 0
 
 def timestampFactory(cls_name, handler, size):

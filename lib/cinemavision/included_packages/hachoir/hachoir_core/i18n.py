@@ -14,6 +14,8 @@ WARNING: Loading this module indirectly calls initLocale() which sets
          settings.
 """
 
+from builtins import str
+from builtins import object
 import hachoir_core.config as config
 import hachoir_core
 import locale
@@ -31,7 +33,7 @@ def _getTerminalCharset():
     try:
         charset = locale.getpreferredencoding()
         if charset:
-            unicode('test', charset)
+            str('test', charset)
             return charset
     except (locale.Error, AttributeError, LookupError):
         pass
@@ -39,7 +41,7 @@ def _getTerminalCharset():
     # (2) Try locale.nl_langinfo(CODESET)
     try:
         charset = locale.nl_langinfo(locale.CODESET)
-        unicode('test', charset)
+        str('test', charset)
         if charset:
             return charset
     except (locale.Error, AttributeError, LookupError):
@@ -47,7 +49,7 @@ def _getTerminalCharset():
 
     # (3) Try sys.stdout.encoding
     if hasattr(sys.stdout, "encoding") and sys.stdout.encoding:
-        unicode('test', sys.stdout.encoding, LookupError)
+        str('test', sys.stdout.encoding, LookupError)
         return sys.stdout.encoding
 
     # (4) Otherwise, returns "ASCII"
@@ -78,7 +80,7 @@ class UnicodeStdout(object):
         self.device.flush()
 
     def write(self, text):
-        if isinstance(text, unicode):
+        if isinstance(text, str):
             text = text.encode(self.charset, 'replace')
         self.device.write(text)
 
@@ -110,13 +112,13 @@ def initLocale():
 initLocale.is_done = False
 
 def _dummy_gettext(text):
-    return unicode(text)
+    return str(text)
 
 def _dummy_ngettext(singular, plural, count):
     if 1 < abs(count) or not count:
-        return unicode(plural)
+        return str(plural)
     else:
-        return unicode(singular)
+        return str(singular)
 
 def _initGettext():
     charset = initLocale()
@@ -148,9 +150,9 @@ def _initGettext():
     # TODO: translate_unicode lambda function really sucks!
     # => find native function to do that
     unicode_gettext = lambda text: \
-        unicode(translate(text), charset)
+        str(translate(text), charset)
     unicode_ngettext = lambda singular, plural, count: \
-        unicode(ngettext(singular, plural, count), charset)
+        str(ngettext(singular, plural, count), charset)
     return (unicode_gettext, unicode_ngettext)
 
 UTF_BOMS = (
@@ -192,14 +194,14 @@ def guessBytesCharset(bytes, default=None):
 
     # Pure ASCII?
     try:
-        text = unicode(bytes, 'ASCII', 'strict')
+        text = str(bytes, 'ASCII', 'strict')
         return 'ASCII'
     except UnicodeDecodeError:
         pass
 
     # Valid UTF-8?
     try:
-        text = unicode(bytes, 'UTF-8', 'strict')
+        text = str(bytes, 'UTF-8', 'strict')
         return 'UTF-8'
     except UnicodeDecodeError:
         pass

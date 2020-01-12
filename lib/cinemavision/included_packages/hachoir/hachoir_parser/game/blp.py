@@ -11,7 +11,11 @@ Creation date: July 10 2007
 - S3TC (DXT1, 3, 5) Formats
   http://en.wikipedia.org/wiki/S3_Texture_Compression
 """
+from __future__ import division
 
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.field import String, UInt32, UInt8, Enum, FieldSet, RawBytes, GenericVector, Bit, Bits
 from hachoir_parser.parser import Parser
@@ -32,7 +36,7 @@ class Generic2DArray(FieldSet):
         self.item_name = item_name
 
     def createFields(self):
-        for i in xrange(self.height):
+        for i in range(self.height):
             yield GenericVector(self, self.row_name+"[]", self.width, self.item_class, self.item_name)
 
 class BLP1File(Parser):
@@ -66,9 +70,9 @@ class BLP1File(Parser):
             4:"Uncompressed Index List + Alpha List",
             5:"Uncompressed Index List"})
         yield UInt32(self, "subtype")
-        for i in xrange(16):
+        for i in range(16):
             yield UInt32(self, "mipmap_offset[]")
-        for i in xrange(16):
+        for i in range(16):
             yield UInt32(self, "mipmap_size[]")
 
         compression = self["compression"].value
@@ -84,7 +88,7 @@ class BLP1File(Parser):
 
         offsets = self.array("mipmap_offset")
         sizes = self.array("mipmap_size")
-        for i in xrange(16):
+        for i in range(16):
             if not offsets[i].value or not sizes[i].value:
                 continue
             padding = self.seekByte(offsets[i].value)
@@ -105,14 +109,14 @@ def interp_avg(data_low, data_high, n):
     >>> list(interp_avg(1, 10, 3))
     [4, 7]
     """
-    if isinstance(data_low, (int, long)):
+    if isinstance(data_low, int):
         for i in range(1, n):
-            yield (data_low * (n-i) + data_high * i) / n
+            yield old_div((data_low * (n-i) + data_high * i), n)
     else: # iterable
-        pairs = zip(data_low, data_high)
+        pairs = list(zip(data_low, data_high))
         pair_iters = [interp_avg(x, y, n) for x, y in pairs]
         for i in range(1, n):
-            yield [iter.next() for iter in pair_iters]
+            yield [next(iter) for iter in pair_iters]
 
 def color_name(data, bits):
     """Color names in #RRGGBB format, given the number of bits for each component."""
@@ -141,7 +145,7 @@ class DXT1(FieldSet):
         else:
             values += interp_avg(values[0], values[1], 2)
             values.append(None) # transparent
-        for i in xrange(16):
+        for i in range(16):
             pixel = Bits(self, "pixel[%i][%i]" % divmod(i, 4), 2)
             color = values[pixel.value]
             if color is None:
@@ -153,7 +157,7 @@ class DXT1(FieldSet):
 class DXT3Alpha(FieldSet):
     static_size = 64
     def createFields(self):
-        for i in xrange(16):
+        for i in range(16):
             yield Bits(self, "alpha[%i][%i]" % divmod(i, 4), 4)
 
 class DXT3(FieldSet):
@@ -175,7 +179,7 @@ class DXT5Alpha(FieldSet):
         else:
             values += interp_avg(values[0], values[1], 5)
             values += [0, 255]
-        for i in xrange(16):
+        for i in range(16):
             pixel = Bits(self, "alpha[%i][%i]" % divmod(i, 4), 3)
             alpha = values[pixel.value]
             pixel._description = "Alpha value: %i" % alpha
@@ -223,9 +227,9 @@ class BLP2File(Parser):
             1:"Mip levels present; number of levels determined by image size"})
         yield UInt32(self, "width", "Base image width")
         yield UInt32(self, "height", "Base image height")
-        for i in xrange(16):
+        for i in range(16):
             yield UInt32(self, "mipmap_offset[]")
-        for i in xrange(16):
+        for i in range(16):
             yield UInt32(self, "mipmap_size[]")
         yield PaletteRGBA(self, "palette", 256)
 
@@ -242,7 +246,7 @@ class BLP2File(Parser):
 
         offsets = self.array("mipmap_offset")
         sizes = self.array("mipmap_size")
-        for i in xrange(16):
+        for i in range(16):
             if not offsets[i].value or not sizes[i].value:
                 continue
             padding = self.seekByte(offsets[i].value)

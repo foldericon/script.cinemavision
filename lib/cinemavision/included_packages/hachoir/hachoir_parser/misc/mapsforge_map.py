@@ -7,7 +7,10 @@ References:
 - http://code.google.com/p/mapsforge/wiki/SpecificationBinaryMapFile
 - http://mapsforge.org/
 """
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (ParserError,
     Bit, Bits, UInt8, UInt16, UInt32, UInt64, String, RawBytes,
@@ -164,7 +167,7 @@ class POIData(FieldSet):
         s = "POI"
         if self["have_name"].value:
             s += ' "%s"' % self["name"]["chars"].value
-        s += " @ %f/%f" % (self["lat_diff"].value / UDEG, self["lon_diff"].value / UDEG)
+        s += " @ %f/%f" % (old_div(self["lat_diff"].value, UDEG), old_div(self["lon_diff"].value, UDEG))
         return s
 
 
@@ -284,7 +287,7 @@ class ZoomSubFile(SeekableFieldSet):
             if numTiles is None:
                 # calculate number of tiles (TODO: better calc this from map bounding box)
                 firstOffset = self["tile_index_entry[0]"]["offset"].value
-                numTiles = firstOffset / 5
+                numTiles = old_div(firstOffset, 5)
             if i >= numTiles:
                 break
 

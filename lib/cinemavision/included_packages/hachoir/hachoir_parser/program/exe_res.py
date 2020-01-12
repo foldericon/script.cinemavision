@@ -9,6 +9,7 @@ Author: Victor Stinner
 Creation date: 2007-01-19
 """
 
+from builtins import range
 from hachoir_core.field import (FieldSet, ParserError, Enum,
     Bit, Bits, SeekableFieldSet,
     UInt16, UInt32, TimestampUnix32,
@@ -318,9 +319,9 @@ class Directory(FieldSet):
                 % self["header/nb_index"].value)
 
         hdr = self["header"]
-        for index in xrange(hdr["nb_name"].value):
+        for index in range(hdr["nb_name"].value):
             yield NameOffset(self, "name[]")
-        for index in xrange(hdr["nb_index"].value):
+        for index in range(hdr["nb_index"].value):
             yield IndexOffset(self, "index[]", self.res_type)
 
     def createDescription(self):

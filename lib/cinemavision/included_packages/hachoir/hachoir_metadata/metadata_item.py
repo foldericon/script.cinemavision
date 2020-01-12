@@ -1,3 +1,6 @@
+from past.builtins import cmp
+from builtins import str
+from builtins import object
 from hachoir_core.tools import makeUnicode, normalizeNewline
 from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_metadata import config
@@ -12,12 +15,12 @@ QUALITY_NORMAL = 0.5
 QUALITY_GOOD = 0.75
 QUALITY_BEST = 1.0
 
-class DataValue:
+class DataValue(object):
     def __init__(self, value, text):
         self.value = value
         self.text = text
 
-class Data:
+class Data(object):
     def __init__(self, key, priority, description,
     text_handler=None, type=None, filter=None, conversion=None):
         """
@@ -25,7 +28,7 @@ class Data:
            def handler(value) -> str/unicode
         """
         assert MIN_PRIORITY <= priority <= MAX_PRIORITY
-        assert isinstance(description, unicode)
+        assert isinstance(description, str)
         self.metadata = None
         self.key = key
         self.description = description
@@ -40,11 +43,11 @@ class Data:
 
     def _createItem(self, value, text=None):
         if text is None:
-            if isinstance(value, unicode):
+            if isinstance(value, str):
                 text = value
             elif self.text_handler:
                 text = self.text_handler(value)
-                assert isinstance(text, unicode)
+                assert isinstance(text, str)
             else:
                 text = makeUnicode(value)
         return DataValue(value, text)
@@ -61,7 +64,7 @@ class Data:
         if value is None:
             return
 
-        if isinstance(value, (str, unicode)):
+        if isinstance(value, str):
             value = normalizeString(value)
             if not value:
                 return
@@ -87,7 +90,7 @@ class Data:
             else:
                 value = new_value
         elif isinstance(value, str):
-            value = unicode(value, "ISO-8859-1")
+            value = str(value, "ISO-8859-1")
 
         if self.type and not isinstance(value, self.type):
             dest_types = " or ".join(str(item.__name__) for item in self.type)
@@ -96,7 +99,7 @@ class Data:
             return
 
         # Skip empty strings
-        if isinstance(value, unicode):
+        if isinstance(value, str):
             value = normalizeNewline(value)
             if config.MAX_STR_LENGTH \
             and config.MAX_STR_LENGTH < len(value):
@@ -113,10 +116,10 @@ class Data:
 
         # For string, if you have "verlongtext" and "verylo",
         # keep the longer value
-        if isinstance(value, unicode):
+        if isinstance(value, str):
             for index, item in enumerate(self.values):
                 item = item.value
-                if not isinstance(item, unicode):
+                if not isinstance(item, str):
                     continue
                 if value.startswith(item):
                     # Find longer value, replace the old one

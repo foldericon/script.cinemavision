@@ -363,8 +363,8 @@ class ZipFile(Parser):
     PARSER_TAGS = {
         "id": "zip",
         "category": "archive",
-        "file_ext": tuple(MIME_TYPES.itervalues()),
-        "mime": tuple(MIME_TYPES.iterkeys()),
+        "file_ext": tuple(MIME_TYPES.values()),
+        "mime": tuple(MIME_TYPES.keys()),
         "magic": (("PK\3\4", 0),),
         "subfile": "skip",
         "min_size": (4 + 26)*8, # header + file entry

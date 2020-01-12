@@ -3,6 +3,9 @@ Collection of postgres-specific extensions, currently including:
 
 * Support for hstore, a key/value type storage
 """
+from builtins import map
+from builtins import str
+from builtins import object
 import uuid
 
 from peewee import *
@@ -94,7 +97,7 @@ class ObjectSlice(_LookupNode):
         elif isinstance(value, int):
             parts = [value]
         else:
-            parts = map(int, value.split(':'))
+            parts = list(map(int, value.split(':')))
         return cls(node, parts)
 
     def __getitem__(self, value):

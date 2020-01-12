@@ -11,7 +11,12 @@ Documentation:
 Authors: Sebastien Ponce, Robert Xiao
 Creation date: 26 April 2008
 """
+from __future__ import division
 
+from builtins import hex
+from builtins import str
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt32, Int16, UInt16, Float32, Float64, CString, Enum,
@@ -332,7 +337,7 @@ class Instruction(FieldSet):
         r = str(self._description)
         for f in self:
             if f.name not in ("action_id", "action_length", "count") and not f.name.startswith("data_type") :
-                r = r + "\n   " + str((self.address+f.address)/8) + " " + str(f.name) + "=" + str(f.value)
+                r = r + "\n   " + str(old_div((self.address+f.address),8)) + " " + str(f.name) + "=" + str(f.value)
         return r
 
 class ActionScript(FieldSet):
@@ -343,7 +348,7 @@ class ActionScript(FieldSet):
     def __str__(self):
         r = ""
         for f in self:
-            r = r + str(f.address/8) + " " + str(f) + "\n"
+            r = r + str(old_div(f.address,8)) + " " + str(f) + "\n"
         return r
 
 def parseActionScript(parent, size):
@@ -404,7 +409,7 @@ class ABCConstantPool(FieldSet):
     def createFields(self):
         ctr = FlashU30(self, "count")
         yield ctr
-        for i in xrange(ctr.value-1):
+        for i in range(ctr.value-1):
             yield self.klass(self, "constant[%i]"%(i+1))
 
 class ABCObjectArray(FieldSet):
@@ -415,7 +420,7 @@ class ABCObjectArray(FieldSet):
     def createFields(self):
         ctr = FlashU30(self, "count")
         yield ctr
-        for i in xrange(ctr.value):
+        for i in range(ctr.value):
             yield self.klass(self, self.arrname+"[]")
 
 class ABCClassArray(FieldSet):
@@ -424,9 +429,9 @@ class ABCClassArray(FieldSet):
     def createFields(self):
         ctr = FlashU30(self, "count")
         yield ctr
-        for i in xrange(ctr.value):
+        for i in range(ctr.value):
             yield ABCInstanceInfo(self, "instance[]")
-        for i in xrange(ctr.value):
+        for i in range(ctr.value):
             yield ABCClassInfo(self, "class[]")
 
 class ABCConstantString(FieldSet):
@@ -470,7 +475,7 @@ class ABCConstantNamespaceSet(FieldSet):
     def createFields(self):
         ctr = FlashU30(self, "namespace_count")
         yield ctr
-        for i in xrange(ctr.value):
+        for i in range(ctr.value):
             yield ABCNSIndex(self, "namespace_index[]")
 
     def createDescription(self):
@@ -556,7 +561,7 @@ class ABCMethodInfo(FieldSet):
     def createFields(self):
         yield FlashU30(self, "param_count")
         yield ABCMultinameIndex(self, "ret_type")
-        for i in xrange(self["param_count"].value):
+        for i in range(self["param_count"].value):
             yield ABCMultinameIndex(self, "param_type[]")
         yield ABCStringIndex(self, "name_index")
         yield Bit(self, "need_arguments")
@@ -570,7 +575,7 @@ class ABCMethodInfo(FieldSet):
         if self["has_optional"].value:
             yield ABCObjectArray(self, "optional", ABCValueKind)
         if self["has_paramnames"].value:
-            for i in xrange(self["param_count"].value):
+            for i in range(self["param_count"].value):
                 yield FlashU30(self, "param_name[]")
 
     def createDescription(self):
@@ -584,9 +589,9 @@ class ABCMetadataInfo(FieldSet):
         yield ABCStringIndex(self, "name_index")
         yield FlashU30(self, "values_count")
         count = self["values_count"].value
-        for i in xrange(count):
+        for i in range(count):
             yield FlashU30(self, "key[]")
-        for i in xrange(count):
+        for i in range(count):
             yield FlashU30(self, "value[]")
 
 class ABCInstanceInfo(FieldSet):
@@ -601,7 +606,7 @@ class ABCInstanceInfo(FieldSet):
         if self['is_protected'].value:
             yield ABCNSIndex(self, "protectedNS")
         yield FlashU30(self, "interfaces_count")
-        for i in xrange(self["interfaces_count"].value):
+        for i in range(self["interfaces_count"].value):
             yield ABCMultinameIndex(self, "interface[]")
         yield ABCMethodIndex(self, "iinit_index")
         yield ABCObjectArray(self, "trait", ABCTrait)

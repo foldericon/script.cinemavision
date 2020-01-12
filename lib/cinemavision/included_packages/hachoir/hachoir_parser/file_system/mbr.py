@@ -12,6 +12,7 @@ Master Boot Record.
 # 2. Ask the system (ioctl/HDIO_GETGEO).
 # 3. 255 heads and 63 sectors/cylinder.
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     Enum, Bits, UInt8, UInt16, UInt32,
@@ -173,7 +174,7 @@ class MasterBootRecord(FieldSet):
         yield textHandler(UInt16(self, "signature", "Signature (0xAA55)"), hexadecimal)
 
     def _getPartitions(self):
-        return ( self[index] for index in xrange(1,5) )
+        return ( self[index] for index in range(1,5) )
     headers = property(_getPartitions)
 
 

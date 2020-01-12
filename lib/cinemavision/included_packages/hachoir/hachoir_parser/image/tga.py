@@ -5,6 +5,7 @@ Author: Victor Stinner
 Creation: 18 december 2006
 """
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import FieldSet, UInt8, UInt16, Enum, RawBytes
 from hachoir_core.endian import LITTLE_ENDIAN
@@ -16,7 +17,7 @@ class Line(FieldSet):
         self._size = self["/width"].value * self["/bpp"].value
 
     def createFields(self):
-        for x in xrange(self["/width"].value):
+        for x in range(self["/width"].value):
             yield UInt8(self, "pixel[]")
 
 class Pixels(FieldSet):
@@ -26,9 +27,9 @@ class Pixels(FieldSet):
 
     def createFields(self):
         if self["/options"].value == 0:
-            RANGE = xrange(self["/height"].value-1,-1,-1)
+            RANGE = range(self["/height"].value-1,-1,-1)
         else:
-            RANGE = xrange(self["/height"].value)
+            RANGE = range(self["/height"].value)
         for y in RANGE:
             yield Line(self, "line[%u]" % y)
 

@@ -5,6 +5,8 @@
 # it under the terms of version 2 of the GNU General Public License as
 # published by the Free Software Foundation.
 
+from builtins import zip
+from builtins import object
 import warnings
 
 from mutagen._util import DictMixin
@@ -96,7 +98,7 @@ class FileType(DictMixin):
         if self.tags is None:
             return []
         else:
-            return self.tags.keys()
+            return list(self.tags.keys())
 
     def delete(self, filename=None):
         """Remove tags from a file."""

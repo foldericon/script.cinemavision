@@ -2,7 +2,9 @@
 Very basic field: raw content with a size in byte. Use this class for
 unknown content.
 """
+from __future__ import division
 
+from past.utils import old_div
 from hachoir_core.field import Field, FieldError
 from hachoir_core.tools import makePrintable
 from hachoir_core.bits import str2hex
@@ -32,7 +34,7 @@ class RawBytes(Field):
         else:
             if self._display is None:
                 address = self.absolute_address
-                length = min(self._size / 8, max_bytes)
+                length = min(old_div(self._size, 8), max_bytes)
                 self._display = self._parent.stream.readBytes(address, length)
             display = self._display
         truncated = (8 * len(display) < self._size)
@@ -61,7 +63,7 @@ class RawBytes(Field):
         if self._display:
             self._display = None
         return self._parent.stream.readBytes(
-            self.absolute_address, self._size / 8)
+            self.absolute_address, old_div(self._size, 8))
 
 class Bytes(RawBytes):
     """

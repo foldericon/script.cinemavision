@@ -28,6 +28,9 @@ Based off the format specification found at
 http://wiki.hydrogenaudio.org/index.php?title=APEv2_specification.
 """
 
+from builtins import bytes
+from builtins import range
+from builtins import object
 __all__ = ["APEv2", "APEv2File", "Open", "delete"]
 
 import sys
@@ -63,7 +66,7 @@ def is_valid_apev2_key(key):
 #  1: Item contains binary information
 #  2: Item is a locator of external stored information [e.g. URL]
 #  3: reserved"
-TEXT, BINARY, EXTERNAL = range(3)
+TEXT, BINARY, EXTERNAL = list(range(3))
 
 HAS_HEADER = 1 << 31
 HAS_NO_FOOTER = 1 << 30
@@ -254,7 +257,7 @@ class _CIDictProxy(DictMixin):
         del(self.__dict[lower])
 
     def keys(self):
-        return [self.__casemap.get(key, key) for key in self.__dict.keys()]
+        return [self.__casemap.get(key, key) for key in list(self.__dict.keys())]
 
 
 class APEv2(_CIDictProxy, Metadata):
@@ -289,7 +292,7 @@ class APEv2(_CIDictProxy, Metadata):
     def __parse_tag(self, tag, count):
         fileobj = cBytesIO(tag)
 
-        for i in xrange(count):
+        for i in range(count):
             size_data = fileobj.read(4)
             # someone writes wrong item counts
             if not size_data:
@@ -418,7 +421,7 @@ class APEv2(_CIDictProxy, Metadata):
         fileobj.seek(0, 2)
 
         tags = []
-        for key, value in self.items():
+        for key, value in list(self.items()):
             # Packed format for an item:
             # 4B: Value length
             # 4B: Value type

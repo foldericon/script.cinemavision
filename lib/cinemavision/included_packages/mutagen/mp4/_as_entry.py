@@ -5,6 +5,8 @@
 # it under the terms of the GNU General Public License version 2 as
 # published by the Free Software Foundation.
 
+from builtins import range
+from builtins import object
 from mutagen._compat import cBytesIO, xrange
 from mutagen.aac import ProgramConfigElement
 from mutagen._util import BitReader, BitReaderError, cdata
@@ -210,7 +212,7 @@ class BaseDescriptor(object):
         """May raise ValueError"""
 
         value = 0
-        for i in xrange(4):
+        for i in range(4):
             try:
                 b = cdata.uint8(fileobj.read(1))
             except cdata.error as e:

@@ -1,12 +1,16 @@
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from builtins import object
 import json
 import os
 import re
 import datetime
 import calendar
-import ratings
-import exceptions
-import util
-from util import T
+from . import ratings
+from . import exceptions
+from . import util
+from .util import T
 
 SAVE_VERSION = 2
 
@@ -149,7 +153,7 @@ class SequenceData(object):
         self._loadPath = ''
         self._process(data_string)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.pathName)
 
     def __len__(self):
@@ -210,7 +214,7 @@ class SequenceData(object):
 
     def conditionsStr(self):
         ret = 'Sequence [{0}]:\n'.format(util.strRepr(self.name))
-        for key, val in self._attrs.items():
+        for key, val in list(self._attrs.items()):
             if val:
                 if isinstance(val, list):
                     ret += '    {0} = {1}\n'.format(key, ', '.join([getConditionValueString(key, v) for v in val]))
@@ -493,7 +497,7 @@ class Item(object):
             val = getattr(self, e['attr'])
             if not val and val is not False:
                 continue
-            sub.text = unicode(val)
+            sub.text = str(val)
             item.append(sub)
         return item
 
@@ -612,7 +616,7 @@ class Item(object):
         if val is None or val is 0:
             return u'{0} ({1})'.format(T(32322, 'Default'), settingDisplay(util.getSettingDefault('{0}.{1}'.format(self._type, setting))))
 
-        return unicode(settingDisplay(val))
+        return str(settingDisplay(val))
 
     def DBChoices(self, attr):
         return None
@@ -691,7 +695,7 @@ class Feature(Item):
 
     @staticmethod
     def DBChoices(attr):
-        import database as DB
+        from . import database as DB
         DB.initialize()
 
         ratingSystem = util.getSettingDefault('rating.system.default')
@@ -968,7 +972,7 @@ class Trailer(Item):
     @staticmethod
     def DBChoices(attr):
         default = util.getSettingDefault('rating.system.default')
-        import ratings
+        from . import ratings
         system = ratings.getRatingsSystem(default)
         if not system:
             return None
@@ -1131,7 +1135,7 @@ class Video(Item):
         return name
 
     def DBChoices(self, attr):
-        import database as DB
+        from . import database as DB
         DB.initialize()
 
         DB.connect()

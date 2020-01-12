@@ -20,6 +20,7 @@ depending on tag or format. They may also be entirely different objects
 for certain keys, again depending on format.
 """
 
+from builtins import map
 from mutagen._file import setFileOpener
 from mutagen._file import FileOpener
 

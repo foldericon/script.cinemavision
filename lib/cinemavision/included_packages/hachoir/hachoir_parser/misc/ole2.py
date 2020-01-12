@@ -19,7 +19,11 @@ Informations:
 Author: Victor Stinner
 Creation: 2006-04-23
 """
+from __future__ import division
 
+from builtins import str
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import HachoirParser
 from hachoir_core.field import (
     FieldSet, ParserError, SeekableFieldSet, RootSeekableFieldSet,
@@ -108,16 +112,16 @@ class DIFat(SeekableFieldSet):
         self.count=db_count
 
     def createFields(self):
-        for index in xrange(NB_DIFAT):
+        for index in range(NB_DIFAT):
             yield SECT(self, "index[%u]" % index)
 
         difat_sect = self.start
         index = NB_DIFAT
-        entries_per_sect = self.parent.sector_size / 32 - 1
-        for ctr in xrange(self.count):
+        entries_per_sect = old_div(self.parent.sector_size, 32) - 1
+        for ctr in range(self.count):
             # this is relative to real DIFAT start
             self.seekBit(NB_DIFAT*SECT.static_size + self.parent.sector_size*difat_sect)
-            for sect_index in xrange(entries_per_sect):
+            for sect_index in range(entries_per_sect):
                 yield SECT(self, "index[%u]" % (index+sect_index))
             index += entries_per_sect
             next = SECT(self, "difat[%u]" % ctr)
@@ -154,7 +158,7 @@ class SectFat(FieldSet):
         self.start = start
 
     def createFields(self):
-        for i in xrange(self.start, self.start + self.count):
+        for i in range(self.start, self.start + self.count):
             yield SECT(self, "index[%u]" % i)
 
 class OLE2_File(HachoirParser, RootSeekableFieldSet):
@@ -207,7 +211,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         # Configure values
         self.sector_size = (8 << header["bb_shift"].value)
         self.fat_count = header["bb_count"].value
-        self.items_per_bbfat = self.sector_size / SECT.static_size
+        self.items_per_bbfat = old_div(self.sector_size, SECT.static_size)
         self.ss_size = (8 << header["sb_shift"].value)
         self.items_per_ssfat = self.items_per_bbfat
 
@@ -228,7 +232,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         self.properties = []
         for block in chain:
             self.seekBlock(block)
-            for index in xrange(prop_per_sector):
+            for index in range(prop_per_sector):
                 property = Property(self, "property[]")
                 yield property
                 self.properties.append(property)
@@ -259,7 +263,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         chain = self.getChain(property["start"].value)
         while True:
             try:
-                block = chain.next()
+                block = next(chain)
                 contiguous = False
                 if first is None:
                     first = block

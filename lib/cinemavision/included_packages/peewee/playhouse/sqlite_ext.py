@@ -31,6 +31,10 @@ best_docs = (Document
 # or use the shortcut method.
 best_docs = Document.match('some phrase')
 """
+from __future__ import division
+from builtins import range
+from past.utils import old_div
+from builtins import object
 import inspect
 import math
 import sqlite3
@@ -202,7 +206,7 @@ class RowIDField(_VirtualFieldMixin, PrimaryKeyField):
 def ClosureTable(model_class, foreign_key=None):
     """Model factory for the transitive closure extension."""
     if foreign_key is None:
-        for field_obj in model_class._meta.rel.values():
+        for field_obj in list(model_class._meta.rel.values()):
             if field_obj.rel_model is model_class:
                 foreign_key = field_obj
                 break
@@ -252,7 +256,7 @@ def ClosureTable(model_class, foreign_key=None):
                 query = query.where(primary_key != node)
             return query
 
-    class Meta:
+    class Meta(object):
         database = model_class._meta.database
         options = {
             'tablename': model_class._meta.db_table,
@@ -298,15 +302,15 @@ class SqliteExtDatabase(SqliteDatabase):
         return conn
 
     def _load_aggregates(self, conn):
-        for name, (klass, num_params) in self._aggregates.items():
+        for name, (klass, num_params) in list(self._aggregates.items()):
             conn.create_aggregate(name, num_params, klass)
 
     def _load_collations(self, conn):
-        for name, fn in self._collations.items():
+        for name, fn in list(self._collations.items()):
             conn.create_collation(name, fn)
 
     def _load_functions(self, conn):
-        for name, (fn, num_params) in self._functions.items():
+        for name, (fn, num_params) in list(self._functions.items()):
             conn.create_function(name, num_params, fn)
 
     def register_aggregate(self, klass, name=None, num_params=-1):
@@ -466,7 +470,7 @@ def bm25(raw_match_info, column_index, k1=1.2, b=0.75):
     if avg_length == 0:
         D = 0
     else:
-        D = 1 - b + (b * (doc_length / avg_length))
+        D = 1 - b + (b * (old_div(doc_length, avg_length)))
 
     for phrase in range(p):
         # p, c, p0c01, p0c02, p0c03, p0c11, p0c12, p0c13, p1c01, p1c02, p1c03..
@@ -481,15 +485,15 @@ def bm25(raw_match_info, column_index, k1=1.2, b=0.75):
         # weeds out those values.
         idf = max(
             math.log(
-                (total_docs - term_matches + 0.5) /
-                (term_matches + 0.5)),
+                old_div((total_docs - term_matches + 0.5),
+                (term_matches + 0.5))),
             0)
 
         denom = term_freq + (k1 * D)
         if denom == 0:
             rhs = 0
         else:
-            rhs = (term_freq * (k1 + 1)) / denom
+            rhs = old_div((term_freq * (k1 + 1)), denom)
 
         score += (idf * rhs)
 

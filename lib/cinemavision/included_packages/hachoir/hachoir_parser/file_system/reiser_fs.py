@@ -20,6 +20,7 @@ Kurz.
 """
 
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, Enum,
     UInt16, UInt32, String, RawBytes, NullBytes, SeekableFieldSet, Bit)
@@ -57,7 +58,7 @@ class BitmapBlock(SeekableFieldSet):
     def createFields(self):
         block_size=self["/superblock/blocksize"].value
         
-        for i in xrange(0, block_size * 8):
+        for i in range(0, block_size * 8):
             yield BlockState(self, "block[]", i)
 
 
@@ -72,7 +73,7 @@ class BitmapBlockGroup(SeekableFieldSet):
    
         yield BitmapBlock(self, "BitmapBlock[]", "Bitmap blocks tells for each block if it is used")    
         # The other bitmap blocks
-        for i in xrange(1, nb_bitmap_block):
+        for i in range(1, nb_bitmap_block):
             self.seekByte( (block_size**2) * 8 * i, relative=False)
             yield BitmapBlock(self, "BitmapBlock[]", "Bitmap blocks tells for each block if it is used")
 

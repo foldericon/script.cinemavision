@@ -14,6 +14,11 @@ Provide explicit field types and/or field names:
     field_names = ['from_acct', 'to_acct', 'timestamp', 'amount']
     Payments = load_csv(db, 'payments.csv', fields, field_names)
 """
+from builtins import next
+from builtins import zip
+from builtins import range
+from past.builtins import basestring
+from builtins import object
 import csv
 import datetime
 import os
@@ -147,7 +152,7 @@ class RowConverter(_CSVReader):
                           csv file.
         :returns: A list of peewee Field objects for each column in the CSV.
         """
-        transposed = zip(*rows)
+        transposed = list(zip(*rows))
         checks = self.get_checks()
         column_types = []
         for i, column in enumerate(transposed):
@@ -239,7 +244,7 @@ class Loader(_CSVReader):
     def get_model_class(self, field_names, fields):
         if self.model:
             return self.model
-        attrs = dict(zip(field_names, fields))
+        attrs = dict(list(zip(field_names, fields)))
         if 'id' not in attrs:
             attrs['_auto_pk'] = PrimaryKeyField()
         elif isinstance(attrs['id'], IntegerField):

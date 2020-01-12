@@ -13,6 +13,8 @@
 # chunk keys should be unicode in Py3k, and unicode or bytes in Py2k (ASCII).
 # To make this easier, chunk keys should be stored internally as unicode.
 
+from builtins import str
+from builtins import object
 import struct
 from struct import pack
 

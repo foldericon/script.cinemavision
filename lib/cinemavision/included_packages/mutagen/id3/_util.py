@@ -8,6 +8,8 @@
 # it under the terms of version 2 of the GNU General Public License as
 # published by the Free Software Foundation.
 
+from builtins import bytes
+from builtins import object
 from .._compat import long_, integer_types, PY3
 from .._util import MutagenError
 

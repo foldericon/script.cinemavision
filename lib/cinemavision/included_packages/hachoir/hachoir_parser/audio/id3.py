@@ -5,7 +5,9 @@ Informations: http://www.id3.org/
 
 Author: Victor Stinner
 """
+from __future__ import division
 
+from past.utils import old_div
 from hachoir_core.field import (FieldSet, MatchError, ParserError,
     Enum, UInt8, UInt24, UInt32,
     CString, String, RawBytes,
@@ -13,6 +15,7 @@ from hachoir_core.field import (FieldSet, MatchError, ParserError,
 from hachoir_core.text_handler import textHandler
 from hachoir_core.tools import humanDuration
 from hachoir_core.endian import NETWORK_ENDIAN
+from functools import reduce
 
 class ID3v1(FieldSet):
     static_size = 128 * 8
@@ -222,7 +225,7 @@ def getCharset(field):
 class ID3_String(FieldSet):
     STRIP = " \0"
     def createFields(self):
-        yield String(self, "text", self._size/8, "Text", charset="ISO-8859-1", strip=self.STRIP)
+        yield String(self, "text", old_div(self._size,8), "Text", charset="ISO-8859-1", strip=self.STRIP)
 
 class ID3_StringCharset(ID3_String):
     STRIP = " \0"
@@ -240,7 +243,7 @@ class ID3_StringCharset(ID3_String):
     }
     def createFields(self):
         yield Enum(UInt8(self, "charset"), self.charset_desc)
-        size = (self.size - self.current_size)/8
+        size = old_div((self.size - self.current_size),8)
         if not size:
             return
         charset = getCharset(self["charset"])
@@ -276,14 +279,14 @@ class ID3_StringTitle(ID3_StringCharset):
             return
         charset = getCharset(self["charset"])
         yield CString(self, "title", "Title", charset=charset, strip=self.STRIP)
-        size = (self.size - self.current_size)/8
+        size = old_div((self.size - self.current_size),8)
         if not size:
             return
         yield String(self, "text", size, "Text", charset=charset, strip=self.STRIP)
 
 class ID3_Private(FieldSet):
     def createFields(self):
-        size = self._size/8
+        size = old_div(self._size,8)
         # TODO: Strings charset?
         if self.stream.readBytes(self.absolute_address, 9) == "PeakValue":
             yield String(self, "text", 9, "Text")
@@ -293,7 +296,7 @@ class ID3_Private(FieldSet):
 class ID3_TrackLength(FieldSet):
     def createFields(self):
         yield NullBytes(self, "zero", 1)
-        yield textHandler(String(self, "length", self._size/8 - 1,
+        yield textHandler(String(self, "length", old_div(self._size,8) - 1,
             "Length in ms", charset="ASCII"), self.computeLength)
 
     def computeLength(self, field):
@@ -333,7 +336,7 @@ class ID3_Picture23(FieldSet):
         yield String(self, "img_fmt", 3, charset="ASCII")
         yield Enum(UInt8(self, "pict_type"), self.pict_type_name)
         yield CString(self, "text", "Text", charset=charset, strip=" \0")
-        size = (self._size - self._current_size) / 8
+        size = old_div((self._size - self._current_size), 8)
         if size:
             yield RawBytes(self, "img_data", size)
 
@@ -344,7 +347,7 @@ class ID3_Picture24(FieldSet):
         yield CString(self, "mime", "MIME type", charset=charset)
         yield Enum(UInt8(self, "pict_type"), ID3_Picture23.pict_type_name)
         yield CString(self, "description", charset=charset)
-        size = (self._size - self._current_size) / 8
+        size = old_div((self._size - self._current_size), 8)
         if size:
             yield RawBytes(self, "img_data", size)
 
@@ -423,7 +426,7 @@ class ID3_Chunk(FieldSet):
             # ID3 v2.2
             yield Enum(String(self, "tag", 3, "Tag", charset="ASCII", strip="\0"), ID3_Chunk.tag22_name)
             yield UInt24(self, "size")
-            size = self["size"].value - self.current_size/8 + 6
+            size = self["size"].value - old_div(self.current_size,8) + 6
             is_compressed = False
 
         if size:

@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 from hachoir_metadata.metadata import (registerExtractor,
     Metadata, RootMetadata, MultipleMetadata)
 from hachoir_parser.audio import AuFile, MpegAudioFile, RealAudioFile, AiffFile, FlacParser
@@ -354,7 +356,7 @@ class MpegAudioMetadata(RootMetadata):
                     break
         if not count:
             return
-        bit_rate = total_bit_rate / count
+        bit_rate = old_div(total_bit_rate, count)
         self.bit_rate = (bit_rate,
             _("%s (Variable bit rate)") % humanBitRate(bit_rate))
         duration = timedelta(seconds=float(mp3["frames"].size) / bit_rate)

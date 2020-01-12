@@ -9,6 +9,7 @@ Author: Victor Stinner
 Creation date: 2006-08-13
 """
 
+from builtins import range
 from hachoir_parser import HachoirParser
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.field import (FieldSet, RootSeekableFieldSet,
@@ -127,7 +128,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
 
         # Read section headers
         sections = []
-        for index in xrange(self["pe_header/nb_section"].value):
+        for index in range(self["pe_header/nb_section"].value):
             section = SectionHeader(self, "section_hdr[]")
             yield section
             if section["phys_size"].value:
@@ -199,7 +200,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
     def createContentSize(self):
         if self.isPE():
             size = 0
-            for index in xrange(self["pe_header/nb_section"].value):
+            for index in range(self["pe_header/nb_section"].value):
                 section = self["section_hdr[%u]" % index]
                 section_size = section["phys_size"].value
                 if not section_size:

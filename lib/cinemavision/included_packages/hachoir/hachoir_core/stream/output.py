@@ -1,4 +1,10 @@
-from cStringIO import StringIO
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import chr
+from builtins import object
+from past.utils import old_div
+from io import StringIO
 from hachoir_core.endian import BIG_ENDIAN, LITTLE_ENDIAN
 from hachoir_core.bits import long2raw
 from hachoir_core.stream import StreamError
@@ -97,7 +103,7 @@ class OutputStream(object):
 
     def copyBitsFrom(self, input, address, nb_bits, endian):
         if (nb_bits % 8) == 0:
-            self.copyBytesFrom(input, address, nb_bits/8)
+            self.copyBytesFrom(input, address, old_div(nb_bits,8))
         else:
             # Arbitrary limit (because we should use a buffer, like copyBytesFrom(),
             # but with endianess problem
@@ -167,7 +173,7 @@ def FileOutputStream(filename, real_filename=None):
 
     Filename have to be unicode, whereas (optional) real_filename can be str.
     """
-    assert isinstance(filename, unicode)
+    assert isinstance(filename, str)
     if not real_filename:
         real_filename = filename
     output = open(real_filename, 'wb')

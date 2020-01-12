@@ -6,6 +6,7 @@ Author: Victor Stinner
 Creation: 16 december 2005
 """
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     UInt8, UInt16, UInt32, Bits,
@@ -29,7 +30,7 @@ class ImageLine(FieldSet):
         self._size = alignValue(self._width * self._pixel.static_size, 32)
 
     def createFields(self):
-        for x in xrange(self._width):
+        for x in range(self._width):
             yield self._pixel(self, "pixel[]")
         size = self.size - self.current_size
         if size:
@@ -43,7 +44,7 @@ class ImagePixels(FieldSet):
         self._pixel = pixel_class
 
     def createFields(self):
-        for y in xrange(self._height-1, -1, -1):
+        for y in range(self._height-1, -1, -1):
             yield ImageLine(self, "line[%u]" % y, self._width, self._pixel)
         size = (self.size - self.current_size) // 8
         if size:

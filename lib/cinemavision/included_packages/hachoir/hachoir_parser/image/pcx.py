@@ -1,7 +1,9 @@
 """
 PCX picture filter.
 """
+from __future__ import division
 
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (
     UInt8, UInt16,
@@ -62,7 +64,7 @@ class PcxFile(Parser):
             raise NotImplementedError
 
         nb_colors = 256
-        size = (self._size - self.current_size)/8
+        size = old_div((self._size - self.current_size),8)
         has_palette = self["bpp"].value == 8
         if has_palette:
             size -= nb_colors*3

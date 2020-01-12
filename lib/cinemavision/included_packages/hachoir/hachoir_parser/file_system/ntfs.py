@@ -11,6 +11,7 @@ Creation date: 3rd january 2007
 Author: Victor Stinner
 """
 
+from builtins import range
 SECTOR_SIZE = 512
 
 from hachoir_parser import Parser
@@ -168,7 +169,7 @@ class Attribute(FieldSet):
 
     def parseBitmap(self):
         size = (self.size - self.current_size)
-        for index in xrange(size):
+        for index in range(size):
             yield Bit(self, "bit[]")
 
     # --- Type information ---
@@ -276,7 +277,7 @@ class NTFS(Parser):
         padding = self.seekByte(offset, relative=False)
         if padding:
             yield padding
-        for index in xrange(1000):
+        for index in range(1000):
             yield File(self, "file[]")
 
         size = (self.size - self.current_size) // 8

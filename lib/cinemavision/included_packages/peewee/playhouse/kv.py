@@ -1,3 +1,5 @@
+from builtins import map
+from builtins import object
 from base64 import b64decode
 from base64 import b64encode
 import operator
@@ -51,7 +53,7 @@ class KeyStore(object):
             key = CharField(max_length=255, primary_key=True)
             value = self._value_field
 
-            class Meta:
+            class Meta(object):
                 database = self._database
 
         return KVModel
@@ -114,10 +116,10 @@ class KeyStore(object):
         return self.query().execute()
 
     def keys(self):
-        return map(operator.itemgetter(0), self.query(self.key))
+        return list(map(operator.itemgetter(0), self.query(self.key)))
 
     def values(self):
-        return map(operator.itemgetter(0), self.query(self.value))
+        return list(map(operator.itemgetter(0), self.query(self.value)))
 
     def items(self):
         return iter(self)

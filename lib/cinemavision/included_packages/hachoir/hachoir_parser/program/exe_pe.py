@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import range
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, UInt8, UInt16, UInt32, TimestampUnix32,
     Bytes, String, Enum,
@@ -71,7 +73,7 @@ class SectionHeader(FieldSet):
             if name:
                 return "section_%s" % name
         except HACHOIR_ERRORS as err:
-            self.warning(unicode(err))
+            self.warning(str(err))
         return "section[]"
 
 class DataDirectory(FieldSet):
@@ -207,7 +209,7 @@ class PE_OptHeader(FieldSet):
         yield filesizeHandler(UInt32(self, "size_heap_commit"))
         yield UInt32(self, "loader_flags")
         yield UInt32(self, "nb_directory", "Number of RVA and sizes")
-        for index in xrange(self["nb_directory"].value):
+        for index in range(self["nb_directory"].value):
             try:
                 name = self.DIRECTORY_NAME[index]
             except KeyError:

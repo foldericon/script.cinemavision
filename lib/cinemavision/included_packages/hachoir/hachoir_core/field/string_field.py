@@ -15,6 +15,7 @@ Note: For PascalStringXX, prefixed value is the number of bytes and not
       of characters!
 """
 
+from builtins import str
 from hachoir_core.field import FieldError, Bytes
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.tools import alignValue, makePrintable
@@ -230,7 +231,7 @@ class GenericString(Bytes):
 
         # Try to convert to Unicode
         try:
-            return unicode(text, self._charset, "strict")
+            return str(text, self._charset, "strict")
         except UnicodeDecodeError as err:
             pass
 
@@ -242,7 +243,7 @@ class GenericString(Bytes):
         and err.end == len(text) \
         and self._charset == "UTF-16-LE":
             try:
-                text = unicode(text+"\0", self._charset, "strict")
+                text = str(text+"\0", self._charset, "strict")
                 self.warning("Fix truncated %s string: add missing nul byte" % self._charset)
                 return text
             except UnicodeDecodeError as err:
@@ -250,7 +251,7 @@ class GenericString(Bytes):
 
         # On error, use FALLBACK_CHARSET
         self.warning(u"Unable to convert string to Unicode: %s" % err)
-        return unicode(text, FALLBACK_CHARSET, "strict")
+        return str(text, FALLBACK_CHARSET, "strict")
 
     def _guessCharset(self):
         addr = self.absolute_address + self._content_offset * 8
@@ -287,11 +288,11 @@ class GenericString(Bytes):
 
         # Strip string if needed
         if self._strip:
-            if isinstance(self._strip, (str, unicode)):
+            if isinstance(self._strip, str):
                 text = text.strip(self._strip)
             else:
                 text = text.strip()
-        assert isinstance(text, unicode)
+        assert isinstance(text, str)
         return text
 
     def createDisplay(self, human=True):
@@ -344,7 +345,7 @@ class GenericString(Bytes):
     def getFieldType(self):
         info = self.charset
         if self._strip:
-            if isinstance(self._strip, (str, unicode)):
+            if isinstance(self._strip, str):
                 info += ",strip=%s" % makePrintable(self._strip, "ASCII", quote="'")
             else:
                 info += ",strip=True"

@@ -1,13 +1,15 @@
+from __future__ import absolute_import
+from builtins import str
 import xbmc
 import xbmcgui
-import kodigui
-import kodiutil
-from kodiutil import T
+from . import kodigui
+from . import kodiutil
+from .kodiutil import T
 
 kodiutil.checkAPILevel()
 
-import experience  # noqa E402
-import cvutil  # noqa E402
+from . import experience  # noqa E402
+from . import cvutil  # noqa E402
 
 
 CHANNEL_STRINGS = {
@@ -245,7 +247,7 @@ class PlaylistDialog(kodigui.BaseDialog):
                 item.setProperty('moving', '1')
 
     def apply(self):
-        from kodijsonrpc import rpc
+        from .kodijsonrpc import rpc
 
         rpc.Playlist.Clear(playlistid=xbmc.PLAYLIST_VIDEO)
 

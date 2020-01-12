@@ -1,11 +1,14 @@
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
 import os
 import sys
-import util
+from . import util
 import threading
 import traceback
 
 
-class ActionCommand:
+class ActionCommand(object):
     type = None
 
     def __init__(self, data):
@@ -266,7 +269,7 @@ class HTTPSCommand(HTTPCommand):
         ActionCommand.__init__(self, data)
 
 
-class ActionFileProcessor:
+class ActionFileProcessor(object):
     commandClasses = {
         'http': HTTPCommand,
         'https': HTTPSCommand,

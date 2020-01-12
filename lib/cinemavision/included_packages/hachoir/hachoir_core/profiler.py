@@ -1,3 +1,4 @@
+from __future__ import print_function
 from hotshot import Profile
 from hotshot.stats import load as loadStats
 from os import unlink

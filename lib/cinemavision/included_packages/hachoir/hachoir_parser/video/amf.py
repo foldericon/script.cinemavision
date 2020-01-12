@@ -10,6 +10,7 @@ Author: Victor Stinner
 Creation date: 4 november 2006
 """
 
+from builtins import range
 from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, PascalString16, Float64)
 from hachoir_core.tools import timestampUNIX
@@ -25,7 +26,7 @@ def parseBool(parent):
 
 def parseArray(parent):
     yield UInt32(parent, "count")
-    for index in xrange(parent["count"].value):
+    for index in range(parent["count"].value):
         yield AMFObject(parent, "item[]")
 
 def parseObjectAttributes(parent):
@@ -37,7 +38,7 @@ def parseObjectAttributes(parent):
 
 def parseMixedArray(parent):
     yield UInt32(parent, "count")
-    for index in xrange(parent["count"].value + 1):
+    for index in range(parent["count"].value + 1):
         item = Attribute(parent, "item[]")
         yield item
         if not item['key'].value:

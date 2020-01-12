@@ -7,7 +7,12 @@
 # published by the Free Software Foundation.
 
 """MPEG audio stream information and tags."""
+from __future__ import division
 
+from builtins import str
+from builtins import range
+from past.utils import old_div
+from builtins import object
 import os
 import struct
 
@@ -72,7 +77,7 @@ def _guess_xing_bitrate_mode(xing):
 
 
 # Mode values.
-STEREO, JOINTSTEREO, DUALCHANNEL, MONO = range(4)
+STEREO, JOINTSTEREO, DUALCHANNEL, MONO = list(range(4))
 
 
 class MPEGInfo(StreamInfo):
@@ -284,7 +289,7 @@ class MPEGInfo(StreamInfo):
                     samples -= lame.encoder_padding_end
                 self.length = float(samples) / self.sample_rate
             if xing.bytes != -1 and self.length:
-                self.bitrate = int((xing.bytes * 8) / self.length)
+                self.bitrate = int(old_div((xing.bytes * 8), self.length))
             if xing.lame_version:
                 self.encoder_info = u"LAME %s" % xing.lame_version
             if lame is not None:
@@ -306,7 +311,7 @@ class MPEGInfo(StreamInfo):
             self.sketchy = False
             self.length = float(frame_size * vbri.frames) / self.sample_rate
             if self.length:
-                self.bitrate = int((vbri.bytes * 8) / self.length)
+                self.bitrate = int(old_div((vbri.bytes * 8), self.length))
 
     def pprint(self):
         info = str(self.bitrate_mode).split(".", 1)[-1]

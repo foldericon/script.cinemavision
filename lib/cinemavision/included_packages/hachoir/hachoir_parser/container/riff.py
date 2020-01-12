@@ -28,7 +28,9 @@ Thanks to:
    * Wojtek Kaniewski (wojtekka AT logonet.com.pl) for its CDA file
      format information
 """
+from __future__ import division
 
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, Enum,
@@ -271,10 +273,10 @@ class Chunk(FieldSet):
         if self["tag"].value == "LIST":
             yield String(self, "subtag", 4, "Sub-tag", charset="ASCII")
             handler = self.tag_info[1]
-            while 8 < (self.size - self.current_size)/8:
+            while 8 < old_div((self.size - self.current_size),8):
                 field = self.__class__(self, "field[]")
                 yield field
-                if (field.size/8) % 2 != 0:
+                if (old_div(field.size,8)) % 2 != 0:
                     yield UInt8(self, "padding[]", "Padding")
         else:
             handler = self.tag_info[1]
@@ -399,7 +401,7 @@ class RiffFile(Parser):
         while self.current_size < self["filesize"].value*8+8:
             yield chunk_cls(self, "chunk[]")
         if not self.eof:
-            yield RawBytes(self, "padding[]", (self.size-self.current_size)/8)
+            yield RawBytes(self, "padding[]", old_div((self.size-self.current_size),8))
 
     def createMimeType(self):
         try:

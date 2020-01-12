@@ -1,3 +1,7 @@
+from __future__ import division
+from builtins import str
+from builtins import range
+from past.utils import old_div
 from hachoir_metadata.metadata import RootMetadata, registerExtractor
 from hachoir_metadata.image import computeComprRate
 from hachoir_parser.image.exif import IFD, BasicIFDEntry
@@ -120,7 +124,7 @@ class JpegMetadata(RootMetadata):
         sumcoeff = 0
         for qt in qtlist:
            coeff = qt.array("coeff")
-           for index in xrange(64):
+           for index in range(64):
                 sumcoeff += coeff[index].value
 
         # Choose the right quality table and compute hash value
@@ -138,7 +142,7 @@ class JpegMetadata(RootMetadata):
             return
 
         # Find the JPEG quality
-        for index in xrange(100):
+        for index in range(100):
             if (hashval >= hashtable[index]) or (sumcoeff >= sumtable[index]):
                 quality = "%s%%" % (index + 1)
                 if (hashval > hashtable[index]) or (sumcoeff > sumtable[index]):
@@ -176,7 +180,7 @@ class JpegMetadata(RootMetadata):
             if not value:
                 return
             if isinstance(value, float):
-                value = (value, u"1/%g" % (1/value))
+                value = (value, u"1/%g" % (old_div(1,value)))
         elif entry["type"].value in (BasicIFDEntry.TYPE_RATIONAL, BasicIFDEntry.TYPE_SIGNED_RATIONAL):
             value = (value, u"%.3g" % value)
 
@@ -251,7 +255,7 @@ class JpegMetadata(RootMetadata):
 
             # Get value
             value = field["content"].value
-            if isinstance(value, (str, unicode)):
+            if isinstance(value, str):
                 value = value.replace("\r", " ")
                 value = value.replace("\n", " ")
 

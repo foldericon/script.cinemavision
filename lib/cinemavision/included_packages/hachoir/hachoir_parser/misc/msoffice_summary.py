@@ -7,6 +7,8 @@ Documents
  - Apache POI (HPSF Internals):
    http://poi.apache.org/hpsf/internals.html
 """
+from builtins import range
+from builtins import object
 from hachoir_core.endian import BIG_ENDIAN,LITTLE_ENDIAN
 from hachoir_parser import HachoirParser
 from hachoir_core.field import (FieldSet, ParserError,
@@ -30,7 +32,7 @@ OS_NAME = {
     2: "Windows 32-bit",
 }
 
-class OSConfig:
+class OSConfig(object):
     def __init__(self, big_endian):
         if big_endian:
             self.charset = "MacRoman"
@@ -273,7 +275,7 @@ class PropertyContent(FieldSet):
             # raise ParserError(
         elif self["is_vector"].value:
             yield UInt32(self, "count")
-            for index in xrange(self["count"].value):
+            for index in range(self["count"].value):
                 yield handler(self, "item[]", **kw)
         else:
             yield handler(self, "value", **kw)
@@ -289,9 +291,9 @@ class SummarySection(SeekableFieldSet):
         self.osconfig = self.parent.osconfig
         yield UInt32(self, "size")
         yield UInt32(self, "property_count")
-        for index in xrange(self["property_count"].value):
+        for index in range(self["property_count"].value):
             yield PropertyIndex(self, "property_index[]")
-        for index in xrange(self["property_count"].value):
+        for index in range(self["property_count"].value):
             findex = self["property_index[%u]" % index]
             self.seekByte(findex["offset"].value)
             field = PropertyContent(self, "property[]", findex["id"].display)
@@ -330,7 +332,7 @@ class Summary(OLE2FragmentParser):
             raise ParserError("OLE2: Too much sections (%s)" % self["section_count"].value)
 
         section_indexes = []
-        for index in xrange(self["section_count"].value):
+        for index in range(self["section_count"].value):
             section_index = SummaryIndex(self, "section_index[]")
             yield section_index
             section_indexes.append(section_index)

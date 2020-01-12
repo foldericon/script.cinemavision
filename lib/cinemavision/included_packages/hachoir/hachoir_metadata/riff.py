@@ -1,7 +1,9 @@
 """
 Extract metadata from RIFF file format: AVI video and WAV sound.
 """
+from __future__ import division
 
+from past.utils import old_div
 from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
 from hachoir_metadata.safe import fault_tolerant, getValue
 from hachoir_parser.container.riff import RiffFile
@@ -69,7 +71,7 @@ class RiffMetadata(MultipleMetadata):
             if not self.has("duration") \
             and "audio_data/size" in wav \
             and self.has("bit_rate"):
-                duration = float(wav["audio_data/size"].value)*8 / self.get('bit_rate')
+                duration = old_div(float(wav["audio_data/size"].value)*8, self.get('bit_rate'))
                 self.duration = timedelta(seconds=duration)
 
     def extractInfo(self, fieldset):
@@ -164,12 +166,12 @@ class RiffMetadata(MultipleMetadata):
 
         # Compute global bit rate
         if self.has("duration") and "/movie/size" in headers:
-            self.bit_rate = float(headers["/movie/size"].value) * 8 / timedelta2seconds(self.get('duration'))
+            self.bit_rate = old_div(float(headers["/movie/size"].value) * 8, timedelta2seconds(self.get('duration')))
 
         # Video has index?
         if "/index" in headers:
             self.comment = _("Has audio/video index (%s)") \
-                % humanFilesize(headers["/index"].size/8)
+                % humanFilesize(old_div(headers["/index"].size,8))
 
     @fault_tolerant
     def extractAnim(self, riff):
@@ -182,7 +184,7 @@ class RiffMetadata(MultipleMetadata):
                     break
                 total += rate.value / 60.0
             if count and total:
-                self.frame_rate = count / total
+                self.frame_rate = old_div(count, total)
         if not self.has("frame_rate") and "anim_hdr/jiffie_rate" in riff:
             self.frame_rate = 60.0 / riff["anim_hdr/jiffie_rate"].value
 

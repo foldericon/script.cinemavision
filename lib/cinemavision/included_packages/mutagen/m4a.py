@@ -5,6 +5,14 @@
 # it under the terms of the GNU General Public License version 2 as
 # published by the Free Software Foundation.
 
+from past.builtins import cmp
+from future import standard_library
+standard_library.install_aliases()
+from builtins import chr
+from builtins import zip
+from builtins import range
+from past.builtins import basestring
+from builtins import object
 import sys
 
 if sys.version_info[0] != 2:
@@ -29,7 +37,7 @@ work on metadata over 4GB.
 import struct
 import sys
 
-from cStringIO import StringIO
+from io import StringIO
 
 from ._compat import reraise
 import mutagen
@@ -247,7 +255,7 @@ class M4ATags(DictProxy, Metadata):
                  "\xa9gen", "gnre", "trkn", "disk",
                  "\xa9day", "cpil", "tmpo", "\xa9too",
                  "----", "covr", "\xa9lyr"]
-        order = dict(zip(order, range(len(order))))
+        order = dict(list(zip(order, list(range(len(order))))))
         last = len(order)
         # If there's no key-based way to distinguish, order by length.
         # If there's still no way, go by string comparison on the
@@ -258,7 +266,7 @@ class M4ATags(DictProxy, Metadata):
     def save(self, filename):
         """Save the metadata to the given filename."""
         values = []
-        items = self.items()
+        items = list(self.items())
         items.sort(self.__key_sort)
         for key, value in items:
             render = self.__atoms.get(
@@ -451,7 +459,7 @@ class M4ATags(DictProxy, Metadata):
 
     def pprint(self):
         values = []
-        for key, value in self.iteritems():
+        for key, value in self.items():
             key = key.decode('latin1')
             try:
                 values.append("%s=%s" % (key, value))
@@ -519,13 +527,13 @@ class M4A(FileType):
             atoms = Atoms(fileobj)
             try:
                 self.info = M4AInfo(atoms, fileobj)
-            except StandardError as err:
+            except Exception as err:
                 reraise(M4AStreamInfoError, err, sys.exc_info()[2])
             try:
                 self.tags = M4ATags(atoms, fileobj)
             except M4AMetadataError:
                 self.tags = None
-            except StandardError as err:
+            except Exception as err:
                 reraise(M4AMetadataError, err, sys.exc_info()[2])
         finally:
             fileobj.close()

@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import str
+from builtins import object
 import os
 import sys
 import re
@@ -13,7 +16,7 @@ def pathIs3D(path):
     return bool(re.search(TAGS_3D_REGEX, path))
 
 
-class Progress:
+class Progress(object):
     def __init__(self, title=''):
         self.title = title
         self.pct = 0
@@ -107,7 +110,7 @@ try:
     def T(ID, eng=''):
         return _T(ID)
 
-    class VFS:
+    class VFS(object):
         def __getattr__(self, attr):
             return getattr(xbmcvfs, attr)
 

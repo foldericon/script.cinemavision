@@ -1,9 +1,10 @@
+from builtins import object
 from hachoir_core.field import CompressedField
 
 try:
     from zlib import decompressobj, MAX_WBITS
 
-    class DeflateStream:
+    class DeflateStream(object):
         def __init__(self, stream, wbits=None):
             if wbits:
                 self.gzip = decompressobj(-MAX_WBITS)

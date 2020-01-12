@@ -1,10 +1,11 @@
+from builtins import object
 import datetime
 from .. import ratings
 
 CONTENT_PATH = None
 
 
-class Trailer:
+class Trailer(object):
     def __init__(self, data):
         self.data = data
 
@@ -57,7 +58,7 @@ class Trailer:
         return ''
 
 
-class Scraper:
+class Scraper(object):
     ONLY_KEEP_VERIFIED = True
     REMOVE_DAYS_OLD = None
 

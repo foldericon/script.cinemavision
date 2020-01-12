@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from builtins import str
 from hachoir_core.compatibility import any, sorted
 from hachoir_core.endian import endian_name
 from hachoir_core.tools import makePrintable, makeUnicode
@@ -16,7 +17,7 @@ class Metadata(Logger):
     header = u"Metadata"
 
     def __init__(self, parent, quality=QUALITY_NORMAL):
-        assert isinstance(self.header, unicode)
+        assert isinstance(self.header, str)
 
         # Limit to 0.0 .. 1.0
         if parent:
@@ -115,7 +116,7 @@ class Metadata(Logger):
         self.__data[data.key] = data
 
     def __iter__(self):
-        return self.__data.itervalues()
+        return iter(self.__data.values())
 
     def __str__(self):
         r"""
@@ -197,8 +198,8 @@ class Metadata(Logger):
         else:
             return None
 
-    def __nonzero__(self):
-        return any(item for item in self.__data.itervalues())
+    def __bool__(self):
+        return any(item for item in self.__data.values())
 
 class RootMetadata(Metadata):
     def __init__(self, quality=QUALITY_NORMAL):
@@ -218,9 +219,9 @@ class MultipleMetadata(RootMetadata):
         return self.__groups[key]
 
     def iterGroups(self):
-        return self.__groups.itervalues()
+        return iter(self.__groups.values())
 
-    def __nonzero__(self):
+    def __bool__(self):
         if RootMetadata.__nonzero__(self):
             return True
         return any(bool(group) for group in self.__groups)
@@ -252,7 +253,7 @@ class MultipleMetadata(RootMetadata):
             text = common
         else:
             text = []
-        for key, metadata in self.__groups.iteritems():
+        for key, metadata in self.__groups.items():
             if not human:
                 title = key
             else:
@@ -283,7 +284,7 @@ def extractMetadata(parser, quality=QUALITY_NORMAL):
     try:
         metadata.extract(parser)
     except HACHOIR_ERRORS as err:
-        error("Error during metadata extraction: %s" % unicode(err))
+        error("Error during metadata extraction: %s" % str(err))
     if metadata:
         metadata.mime_type = parser.mime_type
         metadata.endian = endian_name[parser.endian]

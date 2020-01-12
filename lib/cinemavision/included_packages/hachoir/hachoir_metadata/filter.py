@@ -1,3 +1,4 @@
+from builtins import object
 from hachoir_metadata.timezone import UTC
 from datetime import date, datetime
 
@@ -5,7 +6,7 @@ from datetime import date, datetime
 MIN_YEAR = 1850
 MAX_YEAR = 2030
 
-class Filter:
+class Filter(object):
     def __init__(self, valid_types, min=None, max=None):
         self.types = valid_types
         self.min = min
@@ -22,7 +23,7 @@ class Filter:
 
 class NumberFilter(Filter):
     def __init__(self, min=None, max=None):
-        Filter.__init__(self, (int, long, float), min, max)
+        Filter.__init__(self, (int, int, float), min, max)
 
 class DatetimeFilter(Filter):
     def __init__(self, min=None, max=None):

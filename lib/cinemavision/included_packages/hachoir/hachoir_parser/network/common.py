@@ -1,3 +1,4 @@
+from builtins import range
 from hachoir_core.field import FieldSet, Field, Bits
 from hachoir_core.bits import str2hex
 from hachoir_parser.network.ouid import REGISTERED_OUID
@@ -44,7 +45,7 @@ class IPv6_Address(Field):
     def createValue(self):
         value = self._parent.stream.readBits(self.absolute_address, 128, self.parent.endian)
         parts = []
-        for index in xrange(8):
+        for index in range(8):
             part = "%04x" % (value & 0xffff)
             value >>= 16
             parts.append(part)

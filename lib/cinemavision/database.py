@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from builtins import object
 import time
 import datetime
 
@@ -16,7 +18,7 @@ except TypeError:
     datetime.datetime = new_datetime
 
 from peewee import peewee # pylint: disable=E0401
-import util
+from . import util
 
 DATABASE_VERSION = 6
 
@@ -167,7 +169,7 @@ def initialize(path=None, callback=None):
     class DBVersion(peewee.Model):
         version = peewee.IntegerField(default=0)
 
-        class Meta:
+        class Meta(object):
             database = DB
 
     DBVersion.create_table(fail_silently=True)
@@ -183,7 +185,7 @@ def initialize(path=None, callback=None):
         accessed = peewee.DateTimeField(null=True)
         pack = peewee.TextField(null=True)
 
-        class Meta:
+        class Meta(object):
             database = DB
 
     callback(' - Music')
@@ -265,7 +267,7 @@ def initialize(path=None, callback=None):
         regEx = peewee.CharField()
         regions = peewee.CharField(null=True)
 
-        class Meta:
+        class Meta(object):
             database = DB
 
     RatingSystem.create_table(fail_silently=True)
@@ -276,7 +278,7 @@ def initialize(path=None, callback=None):
         value = peewee.IntegerField(default=0)
         system = peewee.CharField()
 
-        class Meta:
+        class Meta(object):
             database = DB
 
     Rating.create_table(fail_silently=True)
@@ -289,7 +291,7 @@ def initialize(path=None, callback=None):
         watched = peewee.BooleanField(default=False)
         date = peewee.DateTimeField(default=datetime.date(1900, 1, 1))
 
-        class Meta:
+        class Meta(object):
             database = W_DB
 
     class Trailers(WatchedBase):

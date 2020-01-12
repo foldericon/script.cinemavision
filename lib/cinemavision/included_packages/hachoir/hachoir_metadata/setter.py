@@ -1,3 +1,4 @@
+from builtins import str
 from datetime import date, datetime
 import re
 from hachoir_core.language import Language
@@ -55,7 +56,7 @@ def parseDatetime(value):
     if regs:
         try:
             year = int(regs.group(1))
-            return (date(year, 1, 1), unicode(year))
+            return (date(year, 1, 1), str(year))
         except ValueError:
             pass
     regs = DATE_REGEX1.match(value)
@@ -126,7 +127,7 @@ def parseDatetime(value):
     return None
 
 def setDatetime(meta, key, value):
-    if isinstance(value, (str, unicode)):
+    if isinstance(value, str):
         return parseDatetime(value)
     elif isinstance(value, (date, datetime)):
         return value
@@ -153,7 +154,7 @@ def setTrackTotal(meta, key, total):
         return None
 
 def setTrackNumber(meta, key, number):
-    if isinstance(number, (int, long)):
+    if isinstance(number, int):
         return number
     if "/" in number:
         number, total = number.split("/", 1)

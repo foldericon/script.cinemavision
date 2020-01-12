@@ -13,6 +13,9 @@ Author: Victor Stinner
 Creation date: 15 september 2006
 """
 
+from builtins import str
+from builtins import range
+from builtins import object
 from hachoir_parser import Parser
 from hachoir_parser.audio.mpeg_audio import MpegAudioFile
 from hachoir_core.field import (FieldSet,
@@ -25,7 +28,7 @@ from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.stream import StringInputStream
 from hachoir_core.text_handler import textHandler, hexadecimal
 
-class FragmentGroup:
+class FragmentGroup(object):
     def __init__(self, parser):
         self.items = []
         self.parser = parser
@@ -44,7 +47,7 @@ class FragmentGroup:
 
         # FIXME: Use smarter code to send arguments
         tags = {"class": self.parser, "args": self.args}
-        tags = tags.iteritems()
+        tags = iter(tags.items())
         return StringInputStream(data, "<fragment group>", tags=tags)
 
 class CustomFragment(FieldSet):

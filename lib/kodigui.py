@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
+from builtins import str
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import xbmc
 import xbmcgui
 import time
 import threading
 
 
-class BaseFunctions:
+class BaseFunctions(object):
     xmlFile = ''
     path = ''
     theme = ''
@@ -35,10 +40,10 @@ class BaseFunctions:
         self.isOpen = False
 
     def mouseXTrans(self, val):
-        return int((val / self.getWidth()) * self.width)
+        return int((old_div(val, self.getWidth())) * self.width)
 
     def mouseYTrans(self, val):
-        return int((val / self.getHeight()) * self.height)
+        return int((old_div(val, self.getHeight())) * self.height)
 
 
 class BaseWindow(xbmcgui.WindowXML, BaseFunctions):
@@ -142,7 +147,7 @@ class ManagedListItem(object):
             cls._properties = {}
         cls._properties[prop] = 1
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self._valid
 
     @property
@@ -168,7 +173,7 @@ class ManagedListItem(object):
         self.listItem.setIconImage(self.iconImage)
         self.listItem.setThumbnailImage(self.thumbnailImage)
         self.listItem.setPath(self.path)
-        for k in self.__class__._properties.keys():
+        for k in list(self.__class__._properties.keys()):
             self.listItem.setProperty(k, self.properties.get(k) or '')
 
     def pos(self):
@@ -472,7 +477,7 @@ class ManagedControlList(object):
     def getViewRange(self):
         viewPosition = self.getViewPosition()
         selected = self.getSelectedPosition()
-        return range(max(selected - viewPosition, 0), min(selected + (self._maxViewIndex - viewPosition) + 1, self.size() - 1))
+        return list(range(max(selected - viewPosition, 0), min(selected + (self._maxViewIndex - viewPosition) + 1, self.size() - 1)))
 
     def positionIsValid(self, pos):
         return 0 <= pos < self.size()
@@ -669,7 +674,7 @@ class MultiSelectDialog(BaseDialog):
                 self.result.append(o.dataSource)
 
 
-class PropertyTimer():
+class PropertyTimer(object):
     def __init__(self, window_id, timeout, property_, value, addon_id=None):
         self._winID = window_id
         self._timeout = timeout

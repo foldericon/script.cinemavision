@@ -3,7 +3,10 @@ Microsoft Windows icon and cursor file format parser.
 
 Author: Victor Stinner
 """
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, Enum, RawBytes)
@@ -57,7 +60,7 @@ class IconData(FieldSet):
             yield PaletteRGBA(self, "palette", nb_color)
 
         # Read pixels
-        size = self.header["size"].value - self.current_size/8
+        size = self.header["size"].value - old_div(self.current_size,8)
         yield RawBytes(self, "pixels", size, "Image pixels")
 
 class IcoFile(Parser):
@@ -110,7 +113,7 @@ class IcoFile(Parser):
         yield Enum(UInt16(self, "type", "Resource type"), self.TYPE_NAME)
         yield UInt16(self, "nb_items", "Number of items")
         items = []
-        for index in xrange(self["nb_items"].value):
+        for index in range(self["nb_items"].value):
             item = IconHeader(self, "icon_header[]")
             yield item
             items.append(item)

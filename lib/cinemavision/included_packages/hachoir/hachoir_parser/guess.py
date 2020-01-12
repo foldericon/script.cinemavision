@@ -3,6 +3,8 @@ Parser list managment:
 - createParser() find the best parser for a file.
 """
 
+from builtins import str
+from builtins import object
 import os
 from hachoir_core.error import warning, info, HACHOIR_ERRORS
 from hachoir_parser import ValidateError, HachoirParserList
@@ -68,7 +70,7 @@ class QueryParser(object):
                 key = tag[0]
                 byname = self.db.bytag.get(key,{})
                 if tag[1] is None:
-                    values = byname.itervalues()
+                    values = iter(byname.values())
                 else:
                     values = byname.get(tag[1],()),
                 if key == "id" and values:
@@ -100,15 +102,15 @@ class QueryParser(object):
             try:
                 parser_obj = parser(stream, validate=self.validate)
                 if self.parser_args:
-                    for key, value in self.parser_args.iteritems():
+                    for key, value in self.parser_args.items():
                         setattr(parser_obj, key, value)
                 return parser_obj
             except ValidateError as err:
-                res = unicode(err)
+                res = str(err)
                 if fallback and self.fallback:
                     fb = parser
             except HACHOIR_ERRORS as err:
-                res = unicode(err)
+                res = str(err)
             if warn:
                 if parser == self.other:
                     warn = info

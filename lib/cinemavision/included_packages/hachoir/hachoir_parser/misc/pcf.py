@@ -10,6 +10,7 @@ Author: Victor Stinner
 Creation date: 2007-03-20
 """
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, Enum,
     UInt8, UInt32, Bytes, RawBytes, NullBytes,
@@ -82,7 +83,7 @@ class GlyphNames(FieldSet):
         yield PropertiesFormat(self, "format")
         yield UInt32(self, "count")
         offsets = []
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             offset = UInt32(self, "offset[]")
             yield offset
             offsets.append(offset.value)
@@ -103,7 +104,7 @@ class Properties(GlyphNames):
         yield PropertiesFormat(self, "format")
         yield UInt32(self, "nb_prop")
         properties = []
-        for index in xrange(self["nb_prop"].value):
+        for index in range(self["nb_prop"].value):
             property = Property(self, "property[]")
             yield property
             properties.append(property)
@@ -145,7 +146,7 @@ class PcfFile(Parser):
         yield Bytes(self, "signature", 4, r'File signature ("\1pcf")')
         yield UInt32(self, "nb_toc")
         entries = []
-        for index in xrange(self["nb_toc"].value):
+        for index in range(self["nb_toc"].value):
             entry = TOC(self, "toc[]")
             yield entry
             entries.append(entry)

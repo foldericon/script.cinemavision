@@ -6,6 +6,10 @@
 # it under the terms of version 2 of the GNU General Public License as
 # published by the Free Software Foundation.
 
+from builtins import bytes
+from builtins import zip
+from builtins import range
+from builtins import object
 import struct
 from struct import unpack, pack
 
@@ -475,7 +479,7 @@ class TimeStampSpec(EncodedTextSpec):
 
 class ChannelSpec(ByteSpec):
     (OTHER, MASTER, FRONTRIGHT, FRONTLEFT, BACKRIGHT, BACKLEFT, FRONTCENTRE,
-     BACKCENTRE, SUBWOOFER) = range(9)
+     BACKCENTRE, SUBWOOFER) = list(range(9))
 
 
 class VolumeAdjustmentSpec(Spec):

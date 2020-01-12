@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
 import os
 import time
 import json
@@ -75,7 +78,7 @@ def checkAPILevel():
             os.remove(last)
         if os.path.exists(watched):
             os.remove(watched)
-        import cvutil
+        from . import cvutil
         cvutil.loadContent()
         xbmc.sleep(1000)
 

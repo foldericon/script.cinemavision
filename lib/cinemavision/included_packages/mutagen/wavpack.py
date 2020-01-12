@@ -17,6 +17,7 @@ WavPack is a lossless format that uses APEv2 tags. Read
 for more information.
 """
 
+from builtins import object
 __all__ = ["WavPack", "Open", "delete"]
 
 from mutagen import StreamInfo

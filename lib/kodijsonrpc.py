@@ -1,8 +1,9 @@
+from builtins import object
 import xbmc
 import json
 
 
-class JSONRPCMethod:
+class JSONRPCMethod(object):
 
     class Exception(Exception):
         pass
@@ -40,7 +41,7 @@ class JSONRPCMethod:
         return self
 
 
-class KodiJSONRPC:
+class KodiJSONRPC(object):
     def __init__(self):
         self.methodHandler = JSONRPCMethod()
 

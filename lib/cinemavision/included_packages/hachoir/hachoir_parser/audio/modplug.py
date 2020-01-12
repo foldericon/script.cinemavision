@@ -8,6 +8,7 @@ Author: Christophe GISQUET <christophe.gisquet@free.fr>
 Creation: 10th February 2007
 """
 
+from builtins import range
 from hachoir_core.field import (FieldSet,
     UInt32, UInt16, UInt8, Int8, Float32,
     RawBytes, String, GenericVector, ParserError)
@@ -41,13 +42,13 @@ class Command(FieldSet):
 class MidiSFXExt(FieldSet):
     static_size = 16*32*8
     def createFields(self):
-        for index in xrange(16):
+        for index in range(16):
             yield Command(self, "command[]")
 
 class MidiZXXExt(FieldSet):
     static_size = 128*32*8
     def createFields(self):
-        for index in xrange(128):
+        for index in range(128):
             yield Command(self, "command[]")
 
 def parseMidiConfig(parser):

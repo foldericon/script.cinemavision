@@ -16,6 +16,7 @@ multiple values.
 The specification is at http://www.xiph.org/vorbis/doc/v-comment.html.
 """
 
+from builtins import range
 import sys
 
 import mutagen
@@ -103,7 +104,7 @@ class VComment(mutagen.Metadata, list):
             vendor_length = cdata.uint_le(fileobj.read(4))
             self.vendor = fileobj.read(vendor_length).decode('utf-8', errors)
             count = cdata.uint_le(fileobj.read(4))
-            for i in xrange(count):
+            for i in range(count):
                 length = cdata.uint_le(fileobj.read(4))
                 try:
                     string = fileobj.read(length).decode('utf-8', errors)
@@ -324,4 +325,4 @@ class VCommentDict(VComment, DictMixin):
     def as_dict(self):
         """Return a copy of the comment data in a real dict."""
 
-        return dict([(key, self[key]) for key in self.keys()])
+        return dict([(key, self[key]) for key in list(self.keys())])

@@ -58,6 +58,7 @@ Execution context examples (using above `db` instance):
         # When this function is called, a separate connection is made and will
         # be closed when the function returns.
 """
+from builtins import object
 import heapq
 import logging
 import time

@@ -1,3 +1,4 @@
+from builtins import object
 import math
 import sys
 
@@ -137,7 +138,7 @@ class FlaskDB(object):
             raise RuntimeError('Database must be initialized.')
 
         class BaseModel(Model):
-            class Meta:
+            class Meta(object):
                 database = self.database
 
         return BaseModel

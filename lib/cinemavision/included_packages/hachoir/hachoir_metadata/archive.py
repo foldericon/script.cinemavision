@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 from hachoir_metadata.metadata_item import QUALITY_BEST, QUALITY_FASTEST
 from hachoir_metadata.safe import fault_tolerant, getValue
 from hachoir_metadata.metadata import (
@@ -29,7 +31,7 @@ def computeCompressionRate(meta):
 class Bzip2Metadata(RootMetadata):
     def extract(self, zip):
         if "file" in zip:
-            self.compr_size = zip["file"].size/8
+            self.compr_size = old_div(zip["file"].size,8)
 
 class GzipMetadata(RootMetadata):
     def extract(self, gzip):
@@ -46,7 +48,7 @@ class GzipMetadata(RootMetadata):
             self.filename = getValue(gzip, "filename")
         if gzip["has_comment"].value:
             self.comment = getValue(gzip, "comment")
-        self.compr_size = gzip["file"].size/8
+        self.compr_size = old_div(gzip["file"].size,8)
         self.file_size = gzip["size"].value
 
 class ZipMetadata(MultipleMetadata):

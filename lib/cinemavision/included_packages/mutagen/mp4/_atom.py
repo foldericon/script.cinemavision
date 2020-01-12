@@ -6,6 +6,8 @@
 # it under the terms of the GNU General Public License version 2 as
 # published by the Free Software Foundation.
 
+from past.builtins import basestring
+from builtins import object
 import struct
 
 from mutagen._compat import PY2

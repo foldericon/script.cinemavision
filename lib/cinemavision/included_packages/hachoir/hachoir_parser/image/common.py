@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 from hachoir_core.field import FieldSet, UserVector, UInt8
 
 class RGB(FieldSet):
@@ -33,7 +35,7 @@ class RGBA(RGB):
 
     def createDescription(self):
         description = RGB.createDescription(self)
-        opacity = self["alpha"].value*100/255
+        opacity = old_div(self["alpha"].value*100,255)
         return "%s (opacity: %s%%)" % (description, opacity)
 
 class PaletteRGB(UserVector):

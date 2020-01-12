@@ -12,7 +12,10 @@ Documents:
 Author: Christophe GISQUET <christophe.gisquet@free.fr>
 Creation: 8th February 2007
 """
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (StaticFieldSet, FieldSet,
     Bit, RawBits, Bits,
@@ -59,7 +62,7 @@ class SampleHeader(FieldSet):
         C5_speed = int(16726.0*pow(SEMITONE_BASE, self["relative_note"].value)
                        *pow(PITCH_BASE, self["fine_tune"].value*2))
         return "%s, %ubits, %u samples, %uHz" % \
-               (self["name"].display, 8*bytes, self["length"].value/bytes, C5_speed)
+               (self["name"].display, 8*bytes, old_div(self["length"].value,bytes), C5_speed)
 
 class StuffType(StaticFieldSet):
     format = (
@@ -101,7 +104,7 @@ def createInstrumentContentSize(s, addr):
 
     sample_size = 0
     if samples:
-        for index in xrange(samples):
+        for index in range(samples):
             # Read the sample size from the header
             sample_size += s.stream.readBits(addr, 32, LITTLE_ENDIAN)
             # Seek to next sample header
@@ -139,7 +142,7 @@ class Instrument(FieldSet):
 
             # This part probably wrong
             sample_size = [ ]
-            for index in xrange(num):
+            for index in range(num):
                 sample = SampleHeader(self, "sample_header[]")
                 yield sample
                 sample_size.append(sample["length"].value)
@@ -166,7 +169,7 @@ def parseVolume(val):
     if 0x10<=val<=0x50:
         return "Volume %i" % val-16
     else:
-        return VOLUME_NAME[val/16 - 6]
+        return VOLUME_NAME[old_div(val,16) - 6]
 
 class RealBit(RawBits):
     static_size = 1
@@ -284,7 +287,7 @@ class Note(FieldSet):
 
 class Row(FieldSet):
     def createFields(self):
-        for index in xrange(self["/header/channels"].value):
+        for index in range(self["/header/channels"].value):
             yield Note(self, "note[]")
 
 def createPatternContentSize(s, addr):
@@ -303,7 +306,7 @@ class Pattern(FieldSet):
         yield UInt16(self, "data_size", r"Packed patterndata size")
         rows = self["rows"].value
         self.info("Pattern: %i rows" % rows)
-        for index in xrange(rows):
+        for index in range(rows):
             yield Row(self, "row[]")
 
     def createDescription(self):
@@ -361,9 +364,9 @@ class XMModule(Parser):
 
     def createFields(self):
         yield Header(self, "header")
-        for index in xrange(self["/header/patterns"].value):
+        for index in range(self["/header/patterns"].value):
             yield Pattern(self, "pattern[]")
-        for index in xrange(self["/header/instruments"].value):
+        for index in range(self["/header/instruments"].value):
             yield Instrument(self, "instrument[]")
 
         # Metadata added by ModPlug - can be discarded
@@ -375,11 +378,11 @@ class XMModule(Parser):
         size = Header.static_size
 
         # Add patterns size
-        for index in xrange(self["/header/patterns"].value):
+        for index in range(self["/header/patterns"].value):
             size += createPatternContentSize(self, size)
 
         # Add instruments size
-        for index in xrange(self["/header/instruments"].value):
+        for index in range(self["/header/instruments"].value):
             size += createInstrumentContentSize(self, size)
 
         # Not reporting Modplug metadata

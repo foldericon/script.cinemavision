@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 from hachoir_core.field import Bits, Bytes
 from hachoir_core.tools import makePrintable, humanFilesize
 from hachoir_core import config
@@ -74,7 +76,7 @@ class PaddingBytes(Bytes):
         if self.pattern is None:
             return False
 
-        if self.MAX_SIZE < self._size/8:
+        if self.MAX_SIZE < old_div(self._size,8):
             self.info("only check first %s of padding" % humanFilesize(self.MAX_SIZE))
             content = self._parent.stream.readBytes(
                 self.absolute_address, self.MAX_SIZE)

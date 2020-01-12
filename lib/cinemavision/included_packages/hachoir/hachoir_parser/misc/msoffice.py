@@ -10,6 +10,8 @@ Author: Robert Xiao, Victor Stinner
 Creation: 8 january 2005
 """
 
+from builtins import range
+from builtins import object
 from hachoir_core.field import (SubFile, FieldSet,
     UInt8, UInt16, Int32, UInt32, Enum, String, CString,
     Bits, RawBytes)
@@ -50,7 +52,7 @@ class RootEntry(OLE2FragmentParser):
         chain = ole2.getChain(property["start"].value, ole2.ss_fat)
         while True:
             try:
-                block = chain.next()
+                block = next(chain)
                 contiguous = False
                 if first is None:
                     first = block
@@ -80,7 +82,7 @@ class RootEntry(OLE2FragmentParser):
             previous = block
             size = ole2.ss_size
 
-class FragmentGroup:
+class FragmentGroup(object):
     def __init__(self, parser):
         self.items = []
         self.parser = parser
@@ -99,7 +101,7 @@ class FragmentGroup:
         # FIXME: Use smarter code to send arguments
         self.args["ole2"] = self.items[0].root
         tags = {"class": self.parser, "args": self.args}
-        tags = tags.iteritems()
+        tags = iter(tags.items())
         return StringInputStream(data, "<fragment group>", tags=tags)
 
 class CustomFragment(FieldSet):
@@ -756,7 +758,7 @@ class ThumbsCatalog(OLE2FragmentParser):
         yield UInt32(self, "count")
         yield UInt32(self, "unknown[]")
         yield UInt32(self, "unknown[]")
-        for i in xrange(self['count'].value):
+        for i in range(self['count'].value):
             yield ThumbsCatalog.ThumbsEntry(self, "entry[]")
 
 PROPERTY_NAME = {

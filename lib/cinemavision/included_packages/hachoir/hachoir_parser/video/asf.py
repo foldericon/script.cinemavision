@@ -9,7 +9,11 @@ Informations:
 Author: Victor Stinner
 Creation: 5 august 2006
 """
+from __future__ import division
 
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     UInt16, UInt32, UInt64,
@@ -21,7 +25,7 @@ from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import (
     displayHandler, filesizeHandler)
 from hachoir_core.tools import humanBitRate
-from itertools import izip
+
 from hachoir_parser.video.fourcc import audio_codec_name, video_fourcc_name
 from hachoir_parser.common.win32 import BitmapInfoHeader, GUID
 
@@ -52,7 +56,7 @@ class BitrateMutualExclusion(FieldSet):
     def createFields(self):
         yield Enum(GUID(self, "exclusion_type"), self.mutex_name)
         yield UInt16(self, "nb_stream")
-        for index in xrange(self["nb_stream"].value):
+        for index in range(self["nb_stream"].value):
             yield UInt16(self, "stream[]")
 
 class VideoHeader(FieldSet):
@@ -108,16 +112,16 @@ class Header(FieldSet):
     def createFields(self):
         yield UInt32(self, "obj_count")
         yield PaddingBytes(self, "reserved[]", 2)
-        for index in xrange(self["obj_count"].value):
+        for index in range(self["obj_count"].value):
             yield Object(self, "object[]")
 
 class Metadata(FieldSet):
     guid = "75B22633-668E-11CF-A6D9-00AA0062CE6C"
     names = ("title", "author", "copyright", "xxx", "yyy")
     def createFields(self):
-        for index in xrange(5):
+        for index in range(5):
             yield UInt16(self, "size[]")
-        for name, size in izip(self.names, self.array("size")):
+        for name, size in zip(self.names, self.array("size")):
             if size.value:
                 yield String(self, name, size.value, charset="UTF-16-LE", strip=" \0")
 
@@ -154,7 +158,7 @@ class ExtendedContentDescription(FieldSet):
     guid = "D2D0A440-E307-11D2-97F0-00A0C95EA850"
     def createFields(self):
         yield UInt16(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield Descriptor(self, "descriptor[]")
 
 class Codec(FieldSet):
@@ -183,7 +187,7 @@ class CodecList(FieldSet):
     def createFields(self):
         yield GUID(self, "reserved[]")
         yield UInt32(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield Codec(self, "codec[]")
 
 class SimpleIndexEntry(FieldSet):
@@ -202,7 +206,7 @@ class SimpleIndex(FieldSet):
         yield TimedeltaWin64(self, "entry_interval")
         yield UInt32(self, "max_pckt_count")
         yield UInt32(self, "entry_count")
-        for index in xrange(self["entry_count"].value):
+        for index in range(self["entry_count"].value):
             yield SimpleIndexEntry(self, "entry[]")
 
 class BitRate(FieldSet):
@@ -219,7 +223,7 @@ class BitRateList(FieldSet):
 
     def createFields(self):
         yield UInt16(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield BitRate(self, "bit_rate[]")
 
 class Data(FieldSet):
@@ -229,7 +233,7 @@ class Data(FieldSet):
         yield GUID(self, "file_id")
         yield UInt64(self, "packet_count")
         yield PaddingBytes(self, "reserved", 2)
-        size = (self.size - self.current_size) / 8
+        size = old_div((self.size - self.current_size), 8)
         yield RawBytes(self, "data", size)
 
 class StreamProperty(FieldSet):
@@ -289,7 +293,7 @@ class Object(FieldSet):
         yield GUID(self, "guid")
         yield filesizeHandler(UInt64(self, "size"))
 
-        size = self["size"].value - self.current_size/8
+        size = self["size"].value - old_div(self.current_size,8)
         if 0 < size:
             if self.handler:
                 yield self.handler(self, "content", size=size*8)

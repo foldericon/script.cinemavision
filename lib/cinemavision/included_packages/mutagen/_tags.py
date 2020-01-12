@@ -6,6 +6,7 @@
 # published by the Free Software Foundation.
 
 
+from builtins import object
 class Metadata(object):
     """An abstract dict-like object.
 

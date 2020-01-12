@@ -4,7 +4,10 @@ MPEG audio file parser.
 Creation: 12 decembre 2005
 Author: Victor Stinner
 """
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     MissingField, ParserError, createOrphanField,
@@ -96,7 +99,7 @@ class Frame(FieldSet):
         yield Bit(self, "original", "Is original?")
         yield Enum(Bits(self, "emphasis", 2, "Emphasis"), self.EMPHASIS_NAME)
 
-        size = (self.size - self.current_size) / 8
+        size = old_div((self.size - self.current_size), 8)
         if size:
             yield RawBytes(self, "data", size)
 
@@ -154,9 +157,9 @@ class Frame(FieldSet):
             else:
                 return (frame_size * 72)  // sample_rate + padding
         elif self["layer"].value == self.LAYER_II:
-            return (frame_size * 144) / sample_rate + padding
+            return old_div((frame_size * 144), sample_rate) + padding
         else: # self.LAYER_I:
-            frame_size = (frame_size * 12) / sample_rate
+            frame_size = old_div((frame_size * 12), sample_rate)
             return (frame_size + padding) * 4
 
     def getNbChannel(self):
@@ -251,7 +254,7 @@ class Frames(FieldSet):
 #                yield padding
 
         # Read raw bytes at the end (if any)
-        size = (self.size - self.current_size) / 8
+        size = old_div((self.size - self.current_size), 8)
         if size:
             yield RawBytes(self, "raw", size)
 
@@ -275,8 +278,8 @@ def createMpegAudioMagic():
     # MPEG frame magic
     # TODO: Use longer magic: 32 bits instead of 16 bits
     SYNC_BITS = 2047
-    for version in Frame.VERSION_NAME.iterkeys():
-        for layer in Frame.LAYER_NAME.iterkeys():
+    for version in Frame.VERSION_NAME.keys():
+        for layer in Frame.LAYER_NAME.keys():
             for crc16 in (0, 1):
                 magic = (SYNC_BITS << 5) | (version << 3) | (layer << 1) | crc16
                 magic = long2raw(magic, BIG_ENDIAN, 2)
@@ -304,7 +307,7 @@ class MpegAudioFile(Parser):
             return False
 
         # Validate first 5 frames
-        for index in xrange(5):
+        for index in range(5):
             try:
                 frame = self["frames/frame[%u]" % index]
             except MissingField:

@@ -1,3 +1,8 @@
+from __future__ import division
+from __future__ import print_function
+from builtins import range
+from past.utils import old_div
+from builtins import object
 from hachoir_core.tools import humanDurationNanosec
 from hachoir_core.i18n import _
 from math import floor
@@ -11,7 +16,7 @@ class BenchmarkError(Exception):
         Exception.__init__(self,
             "Benchmark internal error: %s" % message)
 
-class BenchmarkStat:
+class BenchmarkStat(object):
     """
     Benchmark statistics. This class automatically computes minimum value,
     maximum value and sum of all values.
@@ -41,7 +46,7 @@ class BenchmarkStat:
     def __len__(self):
         return len(self._values)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self._values)
 
     def getMin(self):
@@ -53,7 +58,7 @@ class BenchmarkStat:
     def getSum(self):
         return self._sum
 
-class Benchmark:
+class Benchmark(object):
     def __init__(self, max_time=5.0,
     min_count=5, max_count=None, progress_time=1.0):
         """
@@ -94,7 +99,7 @@ class Benchmark:
         because floating point multiplication lose precision with many
         values.
         """
-        average = stat.getSum() / len(stat)
+        average = old_div(stat.getSum(), len(stat))
         values = (stat.getMin(), average, stat.getMax(), stat.getSum())
         values = tuple(self.formatTime(value) for value in values)
         msg = _("Benchmark: best=%s  average=%s  worst=%s  total=%s") % values
@@ -129,7 +134,7 @@ class Benchmark:
         total_time = diff
 
         # Compute needed number of calls
-        count = int(floor(self.max_time / diff))
+        count = int(floor(old_div(self.max_time, diff)))
         count = max(count, self.min_count)
         if self.max_count:
             count = min(count, self.max_count)
@@ -152,10 +157,10 @@ class Benchmark:
             part = count - total_count
 
             # Will takes more than one second?
-            average = total_time / total_count
+            average = old_div(total_time, total_count)
             if self.progress_time < part * average:
-                part = max( int(self.progress_time / average), 1)
-            for index in xrange(part):
+                part = max( int(old_div(self.progress_time, average)), 1)
+            for index in range(part):
                 diff = self._runOnce(func, args, kw)
                 stat.append(diff)
                 total_time += diff

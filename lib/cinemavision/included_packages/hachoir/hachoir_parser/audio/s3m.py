@@ -9,6 +9,8 @@ Author: Christophe GISQUET <christophe.gisquet@free.fr>
 Creation: 11th February 2007
 """
 
+from builtins import range
+from builtins import object
 from hachoir_parser import Parser
 from hachoir_core.field import (StaticFieldSet, FieldSet, Field,
     Bit, Bits,
@@ -19,7 +21,7 @@ from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.tools import alignValue
 
-class Chunk:
+class Chunk(object):
     def __init__(self, cls, name, offset, size, *args):
         # Todo: swap and have None=unknown instead of now: 0=unknown
         assert size != None and size>=0
@@ -29,7 +31,7 @@ class Chunk:
         self.size = size
         self.args = args
 
-class ChunkIndexer:
+class ChunkIndexer(object):
     def __init__(self):
         self.chunks = [ ]
 
@@ -312,13 +314,13 @@ class S3MHeader(Header):
 
     def getSubChunks(self):
         # Instruments -  no warranty that they are concatenated
-        for index in xrange(self["num_instruments"].value):
+        for index in range(self["num_instruments"].value):
             yield Chunk(S3MInstrument, "instrument[]",
                         16*self["instr_pptr/offset[%u]" % index].value,
                         S3MInstrument.static_size//8)
 
         # Patterns - size unknown but listed in their headers
-        for index in xrange(self["num_patterns"].value):
+        for index in range(self["num_patterns"].value):
             yield Chunk(S3MPattern, "pattern[]",
                         16*self["pattern_pptr/offset[%u]" % index].value, 0)
 
@@ -358,7 +360,7 @@ class PTMHeader(Header):
         # Instruments and minimal end position for last pattern
         count = self["num_instruments"].value
         addr = self.absolute_address
-        for index in xrange(count):
+        for index in range(count):
             offset = (self.static_size+index*PTMInstrument.static_size)//8
             yield Chunk(PTMInstrument, "instrument[]", offset,
                         PTMInstrument.static_size//8)

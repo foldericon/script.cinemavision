@@ -8,6 +8,7 @@ Author: Victor Stinner
 Creation: 27 december 2006
 """
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, Bits, ParserError,
     String, UInt32, UInt24, UInt16, UInt8, Enum, RawBits, RawBytes)
@@ -80,7 +81,7 @@ def parseTimeSignature(parser, size):
 
 class Command(FieldSet):
     COMMAND = {}
-    for channel in xrange(16):
+    for channel in range(16):
         COMMAND[0x80+channel] = ("Note off (channel %u)" % channel, parseNote)
         COMMAND[0x90+channel] = ("Note on (channel %u)" % channel, parseNote)
         COMMAND[0xA0+channel] = ("Key after-touch (channel %u)" % channel, parseNote)

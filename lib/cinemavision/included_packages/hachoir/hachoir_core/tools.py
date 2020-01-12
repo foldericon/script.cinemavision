@@ -3,7 +3,11 @@
 """
 Various utilities.
 """
+from __future__ import division
 
+from builtins import str
+from builtins import range
+from past.utils import old_div
 from hachoir_core.i18n import _, ngettext
 import re
 import stat
@@ -176,7 +180,7 @@ def humanFilesize(size):
     size = float(size)
     divisor = 1024
     for unit in units:
-        size = size / divisor
+        size = old_div(size, divisor)
         if size < divisor:
             return "%.1f %s" % (size, unit)
     return "%u %s" % (size, unit)
@@ -200,7 +204,7 @@ def humanBitSize(size):
     units = [u"Kbit", u"Mbit", u"Gbit", u"Tbit"]
     size = float(size)
     for unit in units:
-        size = size / divisor
+        size = old_div(size, divisor)
         if size < divisor:
             return "%.1f %s" % (size, unit)
     return u"%u %s" % (size, unit)
@@ -234,7 +238,7 @@ def humanFrequency(hertz):
     units = [u"kHz", u"MHz", u"GHz", u"THz"]
     hertz = float(hertz)
     for unit in units:
-        hertz = hertz / divisor
+        hertz = old_div(hertz, divisor)
         if hertz < divisor:
             return u"%.1f %s" % (hertz, unit)
     return u"%s %s" % (hertz, unit)
@@ -249,7 +253,7 @@ controlchars = tuple({
         ord("\a"): r"\a",
         ord("\b"): r"\b",
     }.get(code, '\\x%02x' % code)
-    for code in xrange(128)
+    for code in range(128)
 )
 
 def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
@@ -298,8 +302,8 @@ def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
     """
 
     if data:
-        if not isinstance(data, unicode):
-            data = unicode(data, "ISO-8859-1")
+        if not isinstance(data, str):
+            data = str(data, "ISO-8859-1")
             charset = "ASCII"
         data = regex_control_code.sub(
             lambda regs: controlchars[ord(regs.group(1))], data)
@@ -314,7 +318,7 @@ def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
         # Replace \x00\x01 by \0\1
         data = re.sub(r"\\x0([0-7])(?=[^0-7]|$)", r"\\\1", data)
     if to_unicode:
-        data = unicode(data, charset)
+        data = str(data, charset)
     return data
 
 def makeUnicode(text):
@@ -328,10 +332,10 @@ def makeUnicode(text):
     u'a\xe9'
     """
     if isinstance(text, str):
-        text = unicode(text, "ISO-8859-1")
-    elif not isinstance(text, unicode):
+        text = str(text, "ISO-8859-1")
+    elif not isinstance(text, str):
         try:
-            text = unicode(text)
+            text = str(text)
         except UnicodeError:
             try:
                 text = str(text)
@@ -415,7 +419,7 @@ def humanUnixAttributes(mode):
         return '?'
 
     chars = [ ftypelet(mode), 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x' ]
-    for i in xrange(1, 10):
+    for i in range(1, 10):
         if not mode & 1 << 9 - i:
             chars[i] = '-'
     if mode & stat.S_ISUID:
@@ -446,7 +450,7 @@ def createDict(data, index):
     >>> createDict(data, 2)
     {10: 'a', 20: 'b'}
     """
-    return dict( (key,values[index]) for key, values in data.iteritems() )
+    return dict( (key,values[index]) for key, values in data.items() )
 
 # Start of UNIX timestamp (Epoch): 1st January 1970 at 00:00
 UNIX_TIMESTAMP_T0 = datetime(1970, 1, 1)
@@ -468,7 +472,7 @@ def timestampUNIX(value):
     >>> timestampUNIX(2147483647)
     datetime.datetime(2038, 1, 19, 3, 14, 7)
     """
-    if not isinstance(value, (float, int, long)):
+    if not isinstance(value, (float, int)):
         raise TypeError("timestampUNIX(): an integer or float is required")
     if not(0 <= value <= 2147483647):
         raise ValueError("timestampUNIX(): value have to be in 0..2147483647")
@@ -487,7 +491,7 @@ def timestampMac32(value):
     >>> timestampMac32(2843043290)
     datetime.datetime(1994, 2, 2, 14, 14, 50)
     """
-    if not isinstance(value, (float, int, long)):
+    if not isinstance(value, (float, int)):
         raise TypeError("an integer or float is required")
     if not(0 <= value <= 4294967295):
         return _("invalid Mac timestamp (%s)") % value
@@ -503,11 +507,11 @@ def durationWin64(value):
     >>> str(durationWin64(2146280000))
     '0:03:34.628000'
     """
-    if not isinstance(value, (float, int, long)):
+    if not isinstance(value, (float, int)):
         raise TypeError("an integer or float is required")
     if value < 0:
         raise ValueError("value have to be a positive or nul integer")
-    return timedelta(microseconds=value/10)
+    return timedelta(microseconds=old_div(value,10))
 
 # Start of 64-bit Windows timestamp: 1st January 1600 at 00:00
 WIN64_TIMESTAMP_T0 = datetime(1601, 1, 1, 0, 0, 0)
@@ -543,12 +547,12 @@ def timestampUUID60(value):
     >>> timestampUUID60(130435676263032368)
     datetime.datetime(1996, 2, 14, 5, 13, 46, 303236)
     """
-    if not isinstance(value, (float, int, long)):
+    if not isinstance(value, (float, int)):
         raise TypeError("an integer or float is required")
     if value < 0:
         raise ValueError("value have to be a positive or nul integer")
     try:
-        return UUID60_TIMESTAMP_T0 + timedelta(microseconds=value/10)
+        return UUID60_TIMESTAMP_T0 + timedelta(microseconds=old_div(value,10))
     except OverflowError:
         raise ValueError(_("timestampUUID60() overflow (value=%s)") % value)
 
@@ -563,7 +567,7 @@ def humanDatetime(value, strip_microsecond=True):
     >>> humanDatetime( datetime(2003, 6, 30, 16, 0, 5, 370000), False )
     u'2003-06-30 16:00:05.370000'
     """
-    text = unicode(value.isoformat())
+    text = str(value.isoformat())
     text = text.replace('T', ' ')
     if strip_microsecond and "." in text:
         text = text.split(".")[0]

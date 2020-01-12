@@ -1,3 +1,4 @@
+from builtins import object
 from hachoir_core.field import Bytes
 from hachoir_core.tools import makePrintable, humanFilesize
 from hachoir_core.stream import InputIOStream
@@ -9,7 +10,7 @@ class SubFile(Bytes):
     def __init__(self, parent, name, length, description=None,
     parser=None, filename=None, mime_type=None, parser_class=None):
         if filename:
-            if not isinstance(filename, unicode):
+            if not isinstance(filename, str):
                 filename = makePrintable(filename, "ISO-8859-1")
             if not description:
                 description = 'File "%s" (%s)' % (filename, humanFilesize(length))
@@ -27,7 +28,7 @@ class SubFile(Bytes):
             return cis(**args)
         self.setSubIStream(createInputStream)
 
-class CompressedStream:
+class CompressedStream(object):
     offset = 0
 
     def __init__(self, stream, decompressor):

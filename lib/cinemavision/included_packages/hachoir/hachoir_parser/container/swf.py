@@ -13,6 +13,7 @@ Author: Victor Stinner
 Creation date: 29 october 2006
 """
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt16, Int32, UInt32, Int64, CString, Enum,
@@ -81,7 +82,7 @@ SOUND_CODEC = {
 class SoundEnvelope(FieldSet):
     def createFields(self):
         yield UInt8(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield UInt32(self, "mark44[]")
             yield UInt16(self, "level0[]")
             yield UInt16(self, "level1[]")
@@ -203,7 +204,7 @@ class Export(FieldSet):
 
 def parseExport(parent, size):
     yield UInt16(parent, "count")
-    for index in xrange(parent["count"].value):
+    for index in range(parent["count"].value):
         yield Export(parent, "export[]")
 
 def parseProductInfo(parent, size):
@@ -220,7 +221,7 @@ def parseScriptLimits(parent, size):
 
 def parseSymbolClass(parent, size):
     yield UInt16(parent, "count")
-    for index in xrange(parent["count"].value):
+    for index in range(parent["count"].value):
         yield UInt16(parent, "symbol_id[]")
         yield CString(parent, "symbol_name[]")
 
@@ -365,7 +366,7 @@ class Tag(FieldSet):
         return "Tag: %s (%s)" % (self["code"].display, self["length"].display)
 
 class SwfFile(Parser):
-    VALID_VERSIONS = set(xrange(1, 10+1))
+    VALID_VERSIONS = set(range(1, 10+1))
     PARSER_TAGS = {
         "id": "swf",
         "category": "container",

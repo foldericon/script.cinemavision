@@ -1,6 +1,7 @@
 """
 Simple translation of Django model classes to peewee model classes.
 """
+from builtins import object
 from functools import partial
 import logging
 

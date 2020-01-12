@@ -8,7 +8,11 @@ File format references:
 - http://crackerscrap.com/docs/dsromstructure.html
 - http://nocash.emubase.de/gbatek.htm
 """
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
+from builtins import object
 from hachoir_parser import Parser
 from hachoir_core.field import (ParserError,
     UInt8, UInt16, UInt32, UInt64, String, RawBytes, SubFile, FieldSet, NullBits, Bit, Bits, Bytes,
@@ -28,7 +32,7 @@ crc16.py by Bryan G. Olson, 2005
 This module is free software and may be used and
 distributed under the same terms as Python itself.
 """
-class CRC16:
+class CRC16(object):
     _table = None
 
     def _initTable (self):
@@ -107,7 +111,7 @@ class Directory(FieldSet):
 
 class FileNameTable(SeekableFieldSet):
     def createFields(self):
-        self.startOffset = self.absolute_address / 8
+        self.startOffset = old_div(self.absolute_address, 8)
 
         # parent_id of first FileNameDirTable contains number of directories:
         dt = FileNameDirTable(self, "dir_table[]")
@@ -135,7 +139,7 @@ class FATFileEntry(FieldSet):
 
 class FATContent(FieldSet):
     def createFields(self):
-        num_entries = self.parent["header"]["fat_size"].value / 8
+        num_entries = old_div(self.parent["header"]["fat_size"].value, 8)
         for i in range(0, num_entries):
             yield FATFileEntry(self, "entry[]")
 
@@ -216,7 +220,7 @@ class SecureArea(FieldSet):
 
 class DeviceSize(UInt8):
     def createDescription(self):
-        return "%d Mbit" % ((2**(20+self.value)) / (1024*1024))
+        return "%d Mbit" % (old_div((2**(20+self.value)), (1024*1024)))
 
 class Header(FieldSet):
     def createFields(self):
@@ -347,7 +351,7 @@ class NdsFile(Parser, RootSeekableFieldSet):
         # ARM9 overlays
         if self["header"]["arm9_overlay_src"].value > 0:
             self.seekByte(self["header"]["arm9_overlay_src"].value, relative=False)
-            numOvls = self["header"]["arm9_overlay_size"].value / (8*4)
+            numOvls = old_div(self["header"]["arm9_overlay_size"].value, (8*4))
             for i in range(numOvls):
                 yield Overlay(self, "arm9_overlay[]")
 

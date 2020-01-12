@@ -9,6 +9,7 @@ Author: Victor Stinner, Robert Xiao
   http://en.wikipedia.org/wiki/LZW
 """
 
+from builtins import object
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Enum, UInt8, UInt16,
@@ -26,7 +27,7 @@ MAX_WIDTH = 6000
 MAX_HEIGHT = MAX_WIDTH
 MAX_FILE_SIZE = 100 * 1024 * 1024
 
-class FragmentGroup:
+class FragmentGroup(object):
     def __init__(self, parser):
         self.items = []
         self.parser = parser
@@ -45,7 +46,7 @@ class FragmentGroup:
         # FIXME: Use smarter code to send arguments
         self.args["startbits"] = self.items[0].parent["lzw_min_code_size"].value
         tags = {"class": self.parser, "args": self.args}
-        tags = tags.iteritems()
+        tags = iter(tags.items())
         return StringInputStream(data, "<fragment group>", tags=tags)
 
 class CustomFragment(FieldSet):
@@ -86,7 +87,7 @@ def rle_repr(l):
     runlen = 1
     result = []
     try:
-        previous = iterable.next()
+        previous = next(iterable)
     except StopIteration:
         return "[]"
     for element in iterable:

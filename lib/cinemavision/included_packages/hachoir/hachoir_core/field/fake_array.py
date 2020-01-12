@@ -1,7 +1,8 @@
+from builtins import object
 import itertools
 from hachoir_core.field import MissingField
 
-class FakeArray:
+class FakeArray(object):
     """
     Simulate an array for GenericFieldSet.array(): fielset.array("item")[0] is
     equivalent to fielset.array("item[0]").
@@ -26,7 +27,7 @@ class FakeArray:
         self._known_size = False
         self._max_index = -1
 
-    def __nonzero__(self):
+    def __bool__(self):
         "Is the array empty or not?"
         if self._cache:
             return True

@@ -10,6 +10,8 @@ References:
     http://partners.adobe.com/public/developer/en/tiff/TIFF6.pdf
 """
 
+from builtins import hex
+from builtins import range
 from hachoir_core.field import (FieldSet, SeekableFieldSet, ParserError,
     UInt8, UInt16, UInt32,
     Int8, Int16, Int32,
@@ -97,7 +99,7 @@ class BasicIFDEntry(FieldSet):
             else:
                 if count > 1:
                     name += "[]"
-                for i in xrange(count):
+                for i in range(count):
                     yield self.value_cls(self, name)
             if totalsize < 32:
                 yield NullBits(self, "padding", 32-totalsize)
@@ -322,10 +324,10 @@ class IFD(SeekableFieldSet):
         count = self["count"].value
         if count == 0:
             raise ParserError("IFDs cannot be empty.")
-        for i in xrange(count):
+        for i in range(count):
             yield self.EntryClass(self, "entry[]")
         yield UInt32(self, "next", "Offset to next IFD")
-        for i in xrange(count):
+        for i in range(count):
             entry = self['entry[%d]'%i]
             if 'offset' not in entry:
                 continue
@@ -337,7 +339,7 @@ class IFD(SeekableFieldSet):
             else:
                 if count > 1:
                     name += "[]"
-                for i in xrange(count):
+                for i in range(count):
                     yield entry.value_cls(self, name)
 
     def getEntryValues(self, entry):

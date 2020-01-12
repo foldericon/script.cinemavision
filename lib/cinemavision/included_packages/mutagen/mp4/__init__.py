@@ -23,6 +23,10 @@ c041828_ISO_IEC_14496-12_2005(E).zip
 were all consulted.
 """
 
+from builtins import bytes
+from builtins import zip
+from builtins import range
+from builtins import object
 import struct
 import sys
 
@@ -326,7 +330,7 @@ class MP4Tags(DictProxy, Metadata):
                  "\xa9gen", "gnre", "trkn", "disk",
                  "\xa9day", "cpil", "pgap", "pcst", "tmpo",
                  "\xa9too", "----", "covr", "\xa9lyr"]
-        order = dict(zip(order, range(len(order))))
+        order = dict(list(zip(order, list(range(len(order))))))
         last = len(order)
         # If there's no key-based way to distinguish, order by length.
         # If there's still no way, go by string comparison on the
@@ -337,7 +341,7 @@ class MP4Tags(DictProxy, Metadata):
         """Save the metadata to the given filename."""
 
         values = []
-        items = sorted(self.items(), key=self._key_sort)
+        items = sorted(list(self.items()), key=self._key_sort)
         for key, value in items:
             atom_name = _key2name(key)[:4]
             if atom_name in self.__atoms:

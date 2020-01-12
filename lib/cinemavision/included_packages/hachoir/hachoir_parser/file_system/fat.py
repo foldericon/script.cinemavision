@@ -1,3 +1,8 @@
+from __future__ import division
+from builtins import str
+from builtins import range
+from builtins import object
+from past.utils import old_div
 from hachoir_core.compatibility import sorted
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, StaticFieldSet,
@@ -46,7 +51,7 @@ class Boot(FieldSet):
         yield textHandler(UInt32(self, "serial", "ID (serial number)"), hexadecimal)
         yield String(self, "label", 11, "Volume Label", strip=' ', charset="ASCII")
         yield String(self, "fs_type", 8, "FAT file system type", strip=' ', charset="ASCII")
-        yield Bytes(self, "code", 510-self.current_size/8, "Operating system boot code")
+        yield Bytes(self, "code", 510-old_div(self.current_size,8), "Operating system boot code")
         yield Bytes(self, "trail_sig", 2, "Signature (0x55 0xAA)")
 
 
@@ -102,7 +107,7 @@ class Date(FieldSet):
         }[name] * 8)
 
     def createFields(self):
-        size = self.size / 8
+        size = old_div(self.size, 8)
         if size > 2:
             if size > 4:
                 yield UInt8(self, "cs", "10ms units, values from 0 to 199")
@@ -115,13 +120,13 @@ class Date(FieldSet):
 
     def createDescription(self):
         date = [ self["year"].value, self["month"].value, self["day"].value ]
-        size = self.size / 8
+        size = old_div(self.size, 8)
         if size > 2:
             mkdate = datetime.datetime
             cs = 200 * self["2sec"].value
             if size > 4:
                 cs += self["cs"].value
-            date += [ self["hour"].value, self["min"].value, cs / 100, cs % 100 * 10000 ]
+            date += [ self["hour"].value, self["min"].value, old_div(cs, 100), cs % 100 * 10000 ]
         else:
             mkdate = datetime.date
         if date == [ 0 for i in date ]:
@@ -267,12 +272,12 @@ class File(Fragment):
     def _getData(self):
         return self["data"]
     def createFields(self):
-        yield Bytes(self, "data", self.datasize/8)
+        yield Bytes(self, "data", old_div(self.datasize,8))
         padding = self._size - self.current_size
         if padding:
             yield createPaddingField(self, padding)
 
-class InodeGen:
+class InodeGen(object):
     def __init__(self, root, entry, path):
         self.root = root
         self.cluster = root.clusters(entry.getCluster)
@@ -287,7 +292,7 @@ class InodeGen:
 
     def __call__(self, prev):
         name = self.path + "[]"
-        address, size, last = self.cluster.next()
+        address, size, last = next(self.cluster)
         if self.filesize:
             if self.done >= self.filesize:
                 error("(FAT) bad metadata for " + self.path)
@@ -335,7 +340,7 @@ class FAT_FS(Parser):
             clus_nb = 1
             next = cluster
             while True:
-                next = self.fat[next/1000][next%1000].value
+                next = self.fat[old_div(next,1000)][next%1000].value
                 if not 1 < next < max_entry:
                     break
                 if cluster + clus_nb == next:
@@ -371,7 +376,7 @@ class FAT_FS(Parser):
         if fat_size == 0:
             fat_size = boot["fat32_size"].value
         fat_size *= self.sector_size * 8
-        for i in xrange(boot["fat_nb"].value):
+        for i in range(boot["fat_nb"].value):
             yield FAT(self, "fat[]", "File Allocation Table", size=fat_size)
 
         # Read inode table (Directory)

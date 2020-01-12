@@ -1,3 +1,4 @@
+from builtins import str
 from optparse import OptionGroup
 from hachoir_core.log import log
 from hachoir_core.i18n import _, getTerminalCharset
@@ -37,7 +38,7 @@ def unicodeFilename(filename, charset=None):
     if not charset:
         charset = getTerminalCharset()
     try:
-        return unicode(filename, charset)
+        return str(filename, charset)
     except UnicodeDecodeError:
         return makePrintable(filename, charset, to_unicode=True)
 

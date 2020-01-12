@@ -10,7 +10,9 @@ Sources:
 
 Author: Victor Stinner
 """
+from __future__ import division
 
+from past.utils import old_div
 from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, String, RawBytes, NullBytes)
 from hachoir_core.text_handler import textHandler, hexadecimal
@@ -105,9 +107,9 @@ class IPTC_Chunk(FieldSet):
 
 class IPTC(FieldSet):
     def createFields(self):
-        while 5 <= (self._size - self.current_size)/8:
+        while 5 <= old_div((self._size - self.current_size),8):
             yield IPTC_Chunk(self, "chunk[]")
-        size = (self._size - self.current_size) / 8
+        size = old_div((self._size - self.current_size), 8)
         if 0 < size:
             yield NullBytes(self, "padding", size)
 

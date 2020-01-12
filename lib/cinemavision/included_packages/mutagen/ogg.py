@@ -16,6 +16,10 @@ This implementation is based on the RFC 3533 standard found at
 http://www.xiph.org/ogg/doc/rfc3533.txt.
 """
 
+from builtins import zip
+from builtins import map
+from builtins import range
+from builtins import object
 import struct
 import sys
 import zlib
@@ -350,7 +354,7 @@ class OggPage(object):
 
         # Number the new pages starting from the first old page.
         first = old_pages[0].sequence
-        for page, seq in zip(new_pages, range(first, first + len(new_pages))):
+        for page, seq in zip(new_pages, list(range(first, first + len(new_pages)))):
             page.sequence = seq
             page.serial = old_pages[0].serial
 

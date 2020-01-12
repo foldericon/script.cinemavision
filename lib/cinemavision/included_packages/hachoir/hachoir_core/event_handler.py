@@ -1,3 +1,4 @@
+from builtins import object
 class EventHandler(object):
     """
     Class to connect events to event handlers.

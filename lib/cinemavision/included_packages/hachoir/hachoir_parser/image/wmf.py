@@ -14,6 +14,7 @@ Author: Victor Stinner
 Creation date: 26 december 2006
 """
 
+from builtins import range
 MAX_FILESIZE = 50 * 1024 * 1024
 
 from hachoir_parser import Parser
@@ -114,7 +115,7 @@ class Point(FieldSet):
 
 def parsePolygon(parser):
     yield UInt16(parser, "count")
-    for index in xrange(parser["count"].value):
+    for index in range(parser["count"].value):
         yield Point(parser, "point[]")
 
 META = {
@@ -230,7 +231,7 @@ class Point16(FieldSet):
 def parsePoint16array(parser):
     yield RECT32(parser, "bounds")
     yield UInt32(parser, "count")
-    for index in xrange(parser["count"].value):
+    for index in range(parser["count"].value):
         yield Point16(parser, "point[]")
 
 def parseGDIComment(parser):
@@ -254,7 +255,7 @@ def parseExtCreatePen(parser):
     yield RGBA(parser, "color")
     yield UInt32(parser, "hatch")
     yield UInt32(parser, "nb_style")
-    for index in xrange(parser["nb_style"].value):
+    for index in range(parser["nb_style"].value):
         yield UInt32(parser, "style")
 
 EMF_META = {
@@ -536,7 +537,7 @@ class WMF_File(Parser):
                 return "Invalid number of parameters"
 
         # Check first functions
-        for index in xrange(5):
+        for index in range(5):
             try:
                 func = self["func[%u]" % index]
             except MissingField:

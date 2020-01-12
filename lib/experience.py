@@ -1,3 +1,8 @@
+from __future__ import division
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
+from past.utils import old_div
 import os
 import re
 import time
@@ -7,16 +12,16 @@ import json
 import xbmc
 import xbmcgui
 
-from kodijsonrpc import rpc
+from .kodijsonrpc import rpc
 
-import kodigui
-import kodiutil
+from . import kodigui
+from . import kodiutil
 
 kodiutil.LOG('Version: {0}'.format(kodiutil.ADDON.getAddonInfo('version')))
 
-import cvutil  # noqa E402
+from . import cvutil  # noqa E402
 
-import cinemavision  # noqa E402
+from . import cinemavision  # noqa E402
 
 
 AUDIO_FORMATS = {
@@ -69,7 +74,7 @@ def resolveURLFile(path):
     return vid.streamURL()
 
 
-class KodiVolumeControl:
+class KodiVolumeControl(object):
     def __init__(self, abort_flag):
         self.saved = None
         self.abortFlag = abort_flag
@@ -167,13 +172,13 @@ class KodiVolumeControl:
                 )
                 return
             left = endTime - time.time()
-            vol = func(end, int(start + (((duration - left) / duration) * volWidth)))
+            vol = func(end, int(start + ((old_div((duration - left), duration)) * volWidth)))
             self._set(vol)
 
         DEBUG_LOG('Fade: END ({0})'.format(vol))
 
 
-class SettingControl:
+class SettingControl(object):
     def __init__(self, setting, log_display, disable_value=''):
         self.setting = setting
         self.logDisplay = log_display
@@ -406,7 +411,7 @@ class ExperienceWindow(kodigui.BaseWindow):
             return True
         return False
 
-    def next(self):
+    def __next__(self):
         if self.action == 'NEXT':
             self.action = None
             return True
@@ -511,7 +516,7 @@ class ExperiencePlayer(xbmc.Player):
             if self.playlist.size():
                 return
 
-        self.next()
+        next(self)
 
     @requiresStart
     def onPlayBackPaused(self):
@@ -569,7 +574,7 @@ class ExperiencePlayer(xbmc.Player):
         elif self.playStatus == self.PLAYING_DUMMY_NEXT:
             self.setPlayStatus(self.NOT_PLAYING)
             DEBUG_LOG('PLAYBACK INTERRUPTED')
-            self.next()
+            next(self)
             return
         elif self.playStatus == self.PLAYING_DUMMY_PREV:
             self.setPlayStatus(self.NOT_PLAYING)
@@ -585,7 +590,7 @@ class ExperiencePlayer(xbmc.Player):
     def onPlayBackFailed(self):
         self.setPlayStatus(self.NOT_PLAYING)
         DEBUG_LOG('PLAYBACK FAILED')
-        self.next()
+        next(self)
 
     @requiresStart
     def onAbort(self):
@@ -983,7 +988,7 @@ class ExperiencePlayer(xbmc.Player):
             self.initSkinVars()
 
     def _start(self, sequence_path):
-        import cvutil
+        from . import cvutil
 
         self.processor = cinemavision.sequenceprocessor.SequenceProcessor(sequence_path, content_path=cvutil.getContentPath())
         [self.processor.addFeature(f) for f in self.features]
@@ -994,7 +999,7 @@ class ExperiencePlayer(xbmc.Player):
         self.openWindow()
         self.processor.process()
         self.setSkinFeatureVars()
-        self.next()
+        next(self)
         self.waitLoop()
 
         del self.window
@@ -1104,7 +1109,7 @@ class ExperiencePlayer(xbmc.Player):
             self.window.setImage(image.path)
 
             stop = time.time() + image.duration
-            fadeStop = image.fade and stop - (image.fade / 1000) or 0
+            fadeStop = image.fade and stop - (old_div(image.fade, 1000)) or 0
 
             while not kodiutil.wait(0.1) and (time.time() < stop or self.window.paused()):
                 if fadeStop and time.time() >= fadeStop and not self.window.paused():
@@ -1114,7 +1119,7 @@ class ExperiencePlayer(xbmc.Player):
                 if not self.window.isOpen:
                     return False
                 elif self.window.action:
-                    if self.window.next():
+                    if next(self.window):
                         return 'NEXT'
                     elif self.window.prev():
                         return 'PREV'
@@ -1143,7 +1148,7 @@ class ExperiencePlayer(xbmc.Player):
                 info.musicEnd = None
                 self.stopMusic(info.imageQueue)
             elif self.window.action:
-                if self.window.next():
+                if next(self.window):
                     return 'NEXT'
                 elif self.window.prev():
                     return 'PREV'
@@ -1164,14 +1169,14 @@ class ExperiencePlayer(xbmc.Player):
 
         return True
 
-    class ImageQueueInfo:
+    class ImageQueueInfo(object):
         def __init__(self, image_queue, music_end):
             self.imageQueue = image_queue
             self.musicEnd = music_end
 
     def showImageQueue(self, image_queue):
         image_queue.reset()
-        image = image_queue.next()
+        image = next(image_queue)
 
         start = time.time()
         end = time.time() + image_queue.duration
@@ -1272,7 +1277,7 @@ class ExperiencePlayer(xbmc.Player):
         if prev:
             playable = self.processor.prev()
         else:
-            playable = self.processor.next()
+            playable = next(self.processor)
 
         if playable is None:
             self.window.doClose()
@@ -1295,13 +1300,13 @@ class ExperiencePlayer(xbmc.Player):
             if action == 'BACK':
                 self.next(prev=True)
             else:
-                self.next()
+                next(self)
 
         elif playable.type == 'IMAGE.QUEUE':
             if not self.showImageQueue(playable):
                 self.next(prev=True)
             else:
-                self.next()
+                next(self)
 
         elif playable.type == 'VIDEO.QUEUE':
             self.showVideoQueue(playable)
@@ -1311,11 +1316,11 @@ class ExperiencePlayer(xbmc.Player):
 
         elif playable.type == 'ACTION':
             self.doAction(playable)
-            self.next()
+            next(self)
 
         else:
             DEBUG_LOG('NOT PLAYING: {0}'.format(playable))
-            self.next()
+            next(self)
 
     def abort(self):
         self.abortFlag.set()

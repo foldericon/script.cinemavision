@@ -1,9 +1,13 @@
+from __future__ import division
 #
 # Matroska parser
 # Author Julien Muchembled <jm AT jm10.no-ip.com>
 # Created: 8 june 2006
 #
 
+from builtins import str
+from builtins import range
+from past.utils import old_div
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, Link,
     MissingField, ParserError,
@@ -38,7 +42,7 @@ class Unsigned(RawInt):
     def hasValue(self):
         return True
     def createValue(self):
-        header = 1 << self._size / 8 * 7
+        header = 1 << old_div(self._size, 8) * 7
         value = RawInt.createValue(self) - header
         if value + 1 == header:
             return None
@@ -46,7 +50,7 @@ class Unsigned(RawInt):
 
 class Signed(Unsigned):
     def createValue(self):
-        header = 1 << self._size / 8 * 7 - 1
+        header = 1 << old_div(self._size, 8) * 7 - 1
         value = RawInt.createValue(self) - 3 * header + 1
         if value == header:
             return None
@@ -166,27 +170,27 @@ class Lace(FieldSet):
         FieldSet.__init__(self, parent, 'Lace', size=size * 8)
 
     def parseXiph(self):
-        for i in xrange(self.n_frames):
+        for i in range(self.n_frames):
             yield XiphInt(self, 'size[]')
-        for i in xrange(self.n_frames):
+        for i in range(self.n_frames):
             yield RawBytes(self, 'frame[]', self['size['+str(i)+']'].value)
-        yield RawBytes(self,'frame[]', (self._size - self.current_size) / 8)
+        yield RawBytes(self,'frame[]', old_div((self._size - self.current_size), 8))
 
     def parseEBML(self):
         yield Unsigned(self, 'size')
-        for i in xrange(1, self.n_frames):
+        for i in range(1, self.n_frames):
             yield Signed(self, 'dsize[]')
         size = self['size'].value
         yield RawBytes(self, 'frame[]', size)
-        for i in xrange(self.n_frames-1):
+        for i in range(self.n_frames-1):
             size += self['dsize['+str(i)+']'].value
             yield RawBytes(self, 'frame[]', size)
-        yield RawBytes(self,'frame[]', (self._size - self.current_size) / 8)
+        yield RawBytes(self,'frame[]', old_div((self._size - self.current_size), 8))
 
     def parseFixed(self):
         n = self.n_frames + 1
-        size = self._size / 8 / n
-        for i in xrange(n):
+        size = old_div(old_div(self._size, 8), n)
+        for i in range(n):
             yield RawBytes(self, 'frame[]', size)
 
 class Block(FieldSet):
@@ -216,7 +220,7 @@ class Block(FieldSet):
             yield NullBits(self, 'reserved', 8)
             return
 
-        size = (self._size - self.current_size) / 8
+        size = old_div((self._size - self.current_size), 8)
         lacing = self['lacing'].value
         if lacing:
             yield textHandler(GenericInteger(self, 'n_frames', False, 8),

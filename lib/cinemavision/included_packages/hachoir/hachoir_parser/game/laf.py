@@ -7,6 +7,7 @@ Author: Cyril Zorin
 Creation date: 1 January 2007
 """
 
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
         UInt8, UInt16, UInt32, GenericVector)
@@ -28,7 +29,7 @@ class CharBitmap(FieldSet):
 
   def createFields(self):
     width = self.char["width_pixels"].value
-    for line in xrange(self.char["height_pixels"].value):
+    for line in range(self.char["height_pixels"].value):
       yield GenericVector(self, "line[]", width,
                           UInt8, "pixel")
 

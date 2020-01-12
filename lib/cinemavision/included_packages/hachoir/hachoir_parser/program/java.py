@@ -59,6 +59,8 @@ TODO/FIXME:
    should update the length field of it's entry, etc.  Sounds like a huge work.
 """
 
+from builtins import str
+from builtins import range
 from hachoir_parser import Parser
 from hachoir_core.field import (
         ParserError, FieldSet, StaticFieldSet,
