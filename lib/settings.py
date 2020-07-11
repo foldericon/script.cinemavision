@@ -1,9 +1,9 @@
-import kodiutil
-from kodiutil import T
+from . import kodiutil
+from .kodiutil import T
 
 
 def clearDBWatchedStatus():
-    from cinemavision import database as DB
+    from .cinemavision import database as DB
 
     rows = DB.Trailers.update(watched=False).where(
         DB.Trailers.watched == 1
@@ -14,7 +14,7 @@ def clearDBWatchedStatus():
 
 
 def clearDBBrokenStatus():
-    from cinemavision import database as DB
+    from .cinemavision import database as DB
 
     rows = DB.Trailers.update(broken=False).where(
         DB.Trailers.broken == 1
@@ -45,9 +45,9 @@ def _pasteLog(logName='kodi.log'):
     import re
     import xbmc
     import xbmcgui
-    from pastebin_python import PastebinPython
+    from .pastebin_python import PastebinPython
 
-    logPath = os.path.join(xbmc.translatePath('special://logpath').decode('utf-8'), logName)
+    logPath = os.path.join(xbmc.translatePath('special://logpath'), logName)
 
     if not os.path.exists(logPath):
         xbmcgui.Dialog().ok(T(32570, 'No Log'), ' ', T(32571, 'That log file does not exist!'))
@@ -83,7 +83,7 @@ def _pasteLog(logName='kodi.log'):
             debug_log('Getting API user key')
             apiUserKey = pb.createAPIUserKey(apiUser, password)
             if apiUserKey.lower().startswith('bad'):
-                xbmcgui.Dialog().ok(T(32573, 'Failed'), u'{0}: {1}'.format(T(32574, 'Failed to create paste as user'), apiUser), '', apiUserKey)
+                xbmcgui.Dialog().ok(T(32573, 'Failed'), '{0}: {1}'.format(T(32574, 'Failed to create paste as user'), apiUser), '', apiUserKey)
                 debug_log('Failed get user API key ({0}): {1}'.format(apiUser, apiUserKey))
             else:
                 with open(apiUserKeyFile, 'w') as f:
@@ -98,7 +98,7 @@ def _pasteLog(logName='kodi.log'):
 
     with kodiutil.Progress('Pastebin', T(32577, 'Creating paste...')):
         with open(logPath, 'r') as f:
-            content = f.read().decode('utf-8')
+            content = f.read()
             for pattern, repl in replaces:
                 content = re.sub(pattern, repl, content)
             urlOrError = pb.createPaste(content, 'Kodi CV LOG: {0}'.format(logName), api_paste_private=1, api_paste_expire_date='1W')
@@ -126,8 +126,8 @@ def _pasteLog(logName='kodi.log'):
 
 def showQRCode(url):
     import os
-    import pyqrcode
-    import kodigui
+    from . import pyqrcode
+    from . import kodigui
     # from kodijsonrpc import rpc
 
     class ImageWindow(kodigui.BaseDialog):
@@ -178,7 +178,7 @@ def removeContentDatabase():
 
 
 def setDefaultSequence(setting):
-    import cvutil
+    from . import cvutil
 
     selection = cvutil.selectSequence()
     if not selection:
@@ -188,8 +188,8 @@ def setDefaultSequence(setting):
 
 
 def setScrapers():
-    import cvutil
-    import cinemavision
+    from . import cvutil
+    from . import cinemavision
 
     selected = [s.strip().lower() for s in kodiutil.getSetting('trailer.scrapers', '').split(',')]
     contentScrapers = cinemavision.util.contentScrapers()
@@ -211,7 +211,7 @@ def setScrapers():
 
 
 def testEventActions(action):
-    import cvutil
+    from . import cvutil
 
     path = None
 

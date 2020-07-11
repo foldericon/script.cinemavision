@@ -1,5 +1,5 @@
-import util
-import database as DB
+from . import util
+from . import database as DB
 from xml.etree import ElementTree as ET
 
 COUNTRY_SYSTEMS = {
@@ -91,7 +91,7 @@ class Rating:
     def __str__(self):
         return self.system and '{0}:{1}'.format(self.system, self.name) or 'Unknown'
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.system)
 
     @classmethod
@@ -202,7 +202,7 @@ def addRatingSystemFromXML(xml):
 
 def getRegExs(context=None):
     ret = {}
-    for system in RATINGS_SYSTEMS.values():
+    for system in list(RATINGS_SYSTEMS.values()):
         regEx = system.getRegEx(context)
         if regEx:
             ret[system.name] = regEx
@@ -263,7 +263,7 @@ def load():
     loadFromDB()
 
     util.DEBUG_LOG('Rating Systems:')
-    for rs in RATINGS_SYSTEMS.values():
+    for rs in list(RATINGS_SYSTEMS.values()):
         util.DEBUG_LOG('  {0}'.format(repr(rs)))
 
 

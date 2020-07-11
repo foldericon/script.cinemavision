@@ -7,6 +7,9 @@ cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile(insp
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 
-import hachoir_core
-import hachoir_parser
-import hachoir_metadata
+import core
+import parser
+import metadata
+
+VERSION = (3, 1, 1)
+__version__ = ".".join(map(str, VERSION))

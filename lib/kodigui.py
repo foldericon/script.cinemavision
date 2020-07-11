@@ -124,7 +124,7 @@ class ManagedListItem(object):
     _properties = None
 
     def __init__(self, label='', label2='', iconImage='', thumbnailImage='', path='', data_source=None):
-        self._listItem = xbmcgui.ListItem(label, label2, iconImage, thumbnailImage, path)
+        self._listItem = xbmcgui.ListItem(label, label2, path)
         self.dataSource = data_source
         self.properties = {}
         self.label = label
@@ -142,7 +142,7 @@ class ManagedListItem(object):
             cls._properties = {}
         cls._properties[prop] = 1
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self._valid
 
     @property
@@ -167,7 +167,7 @@ class ManagedListItem(object):
         self.listItem.setLabel2(self.label2)
         self.listItem.setArt({'thumb': self.thumbnailImage, 'icon': self.iconImage})
         self.listItem.setPath(self.path)
-        for k in self.__class__._properties.keys():
+        for k in list(self.__class__._properties.keys()):
             self.listItem.setProperty(k, self.properties.get(k) or '')
 
     def pos(self):
@@ -471,7 +471,7 @@ class ManagedControlList(object):
     def getViewRange(self):
         viewPosition = self.getViewPosition()
         selected = self.getSelectedPosition()
-        return range(max(selected - viewPosition, 0), min(selected + (self._maxViewIndex - viewPosition) + 1, self.size() - 1))
+        return list(range(max(selected - viewPosition, 0), min(selected + (self._maxViewIndex - viewPosition) + 1, self.size() - 1)))
 
     def positionIsValid(self, pos):
         return 0 <= pos < self.size()

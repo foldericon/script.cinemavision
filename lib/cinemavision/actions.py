@@ -1,8 +1,9 @@
 import os
 import sys
-import util
+from . import util
 import threading
 import traceback
+import importlib
 
 
 class ActionCommand:
@@ -116,7 +117,7 @@ class ModuleCommand(ActionCommand):
                 sys.path.append(self.importPath)
 
             import cinema_vision_command_module
-            reload(cinema_vision_command_module)
+            importlib.reload(cinema_vision_command_module)
 
             result = cinema_vision_command_module.main(*self.args)
             self.log('Action (Module) Succeded: {0} ({1}) - Result: {2}'.format(self.commandData, ', '.join(self.args), result))
@@ -302,9 +303,9 @@ class ActionFileProcessor:
         self.parserLog.append((type_, msg))
 
     def parseError(self, msg, line, lineno, type_='ERROR'):
-        self.logParseErrorLine(u'ACTION {0} (line {1}): {2}'.format(type_, lineno, repr(self.path).lstrip('u').strip("'")), type_)
-        self.logParseErrorLine(u'{0}'.format(repr(line)), type_)
-        self.logParseErrorLine(u'{0}'.format(msg), type_)
+        self.logParseErrorLine('ACTION {0} (line {1}): {2}'.format(type_, lineno, repr(self.path).lstrip('u').strip("'")), type_)
+        self.logParseErrorLine('{0}'.format(repr(line)), type_)
+        self.logParseErrorLine('{0}'.format(msg), type_)
 
     def init(self):
         try:
@@ -389,7 +390,7 @@ class ActionFileProcessor:
                         command = self.commandClasses[name](data)
                         command.setPath(self.path)
                     else:
-                        self.parseError(u'Unrecognized command protocol: {0}'.format(repr(name)), line, lineno)
+                        self.parseError('Unrecognized command protocol: {0}'.format(repr(name)), line, lineno)
                         return
             else:
                 if command:

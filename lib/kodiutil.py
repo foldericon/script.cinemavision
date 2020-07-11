@@ -14,7 +14,7 @@ ADDON = xbmcaddon.Addon(ADDON_ID)
 
 
 def translatePath(path):
-    return xbmc.translatePath(path).decode('utf-8')
+    return xbmc.translatePath(path)
 
 
 PROFILE_PATH = translatePath(ADDON.getAddonInfo('profile'))
@@ -58,7 +58,7 @@ def firstRun():
 
 
 def infoLabel(info):
-    return xbmc.getInfoLabel(info).decode('utf-8')
+    return xbmc.getInfoLabel(info)
 
 
 def checkAPILevel():
@@ -75,7 +75,7 @@ def checkAPILevel():
             os.remove(last)
         if os.path.exists(watched):
             os.remove(watched)
-        import cvutil
+        from . import cvutil
         cvutil.loadContent()
         xbmc.sleep(1000)
 
@@ -110,7 +110,7 @@ def strRepr(str_obj):
 
 
 def getSetting(key, default=None):
-    setting = ADDON.getSetting(key).decode('utf-8')
+    setting = ADDON.getSetting(key)
     return _processSetting(setting, default)
 
 
@@ -211,11 +211,11 @@ class Progress(object):
 
     def __enter__(self):
         if self.isBackground:
-            heading = u'{0} - {1}'.format(self.heading, self.line1)
-            msg = u'{0} - {1}'.format(self.line2, self.line3)
+            heading = '{0} - {1}'.format(self.heading, self.line1)
+            msg = '{0} - {1}'.format(self.line2, self.line3)
             self.dialog.create(heading, msg)
         else:
-            self.dialog.create(self.heading, self.line1, self.line2, self.line3)
+            self.dialog.create(self.heading, self.line1 + self.line2 + self.line3)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -233,11 +233,11 @@ class Progress(object):
         self._update()
 
     def _update(self):
-        self.dialog.update(self.pct, self.line1, self.line2, self.line3)
+        self.dialog.update(self.pct, self.line1 + self.line2 + self.line3)
 
     def _updateBG(self):
-        heading = u'{0} - {1}'.format(self.heading, self.line1)
-        msg = u'{0} - {1}'.format(self.line2, self.line3)
+        heading = '{0} - {1}'.format(self.heading, self.line1)
+        msg = '{0} - {1}'.format(self.line2, self.line3)
         self.dialog.update(self.pct, heading, msg)
 
     def msg(self, msg=None, heading=None, pct=None):

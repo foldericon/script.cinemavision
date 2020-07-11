@@ -101,7 +101,7 @@ try:
     import stat
     import time
 
-    STORAGE_PATH = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile')).decode('utf-8')
+    STORAGE_PATH = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
     _T = xbmcaddon.Addon().getLocalizedString
 
     def T(ID, eng=''):
@@ -113,7 +113,7 @@ try:
 
         def listdir(self, path):
             lists = xbmcvfs.listdir(path)
-            return [x.decode('utf-8') for x in lists[0] + lists[1]]
+            return [x for x in lists[0] + lists[1]]
 
         class File(xbmcvfs.File):
             def __init__(self, *args, **kwargs):

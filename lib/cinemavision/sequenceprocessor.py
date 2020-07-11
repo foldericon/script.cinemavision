@@ -3,12 +3,12 @@ import random
 import re
 import time
 import datetime
-import database as DB
-import sequence
-import scrapers
-import ratings
-import actions
-import util
+from . import database as DB
+from . import sequence
+from . import scrapers
+from . import ratings
+from . import actions
+from . import util
 
 TRAILER_FAIL_THRESHOLD = 10
 
@@ -1363,7 +1363,7 @@ class SequenceProcessor:
 
                 util.DEBUG_LOG('')
 
-    def next(self):
+    def __next__(self):
         if self.atEnd():
             return None
 

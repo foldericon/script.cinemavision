@@ -1,13 +1,13 @@
 import xbmc
 import xbmcgui
-import kodigui
-import kodiutil
-from kodiutil import T
+from . import kodigui
+from . import kodiutil
+from .kodiutil import T
 
 kodiutil.checkAPILevel()
 
-import experience  # noqa E402
-import cvutil  # noqa E402
+from . import experience  # noqa E402
+from . import cvutil  # noqa E402
 
 
 CHANNEL_STRINGS = {
@@ -179,14 +179,14 @@ class PlaylistDialog(kodigui.BaseDialog):
         items = []
         for f in self.features:
             mli = kodigui.ManagedListItem(f.title, f.durationMinutesDisplay, thumbnailImage=f.thumb, data_source=f)
-            mli.setProperty('rating', str(f.rating or '').replace(':', u' \u2022 '))
+            mli.setProperty('rating', str(f.rating or '').replace(':', ' \u2022 '))
             mli.setProperty('year', str(f.year or ''))
             if f.audioFormat:
                 mli.setProperty('af', f.audioFormat)
             elif f.codec and f.codec in CODEC_IMAGES:
                 mli.setProperty('afcodec', f.codec)
                 mli.setProperty('afchannels', str(f.channels or ''))
-            mli.setProperty('genres', f.genres and u' \u2022 '.join(f.genres) or '')
+            mli.setProperty('genres', f.genres and ' \u2022 '.join(f.genres) or '')
             mli.setProperty('codec', str(f.codec or ''))
             mli.setProperty('channels', CHANNEL_STRINGS.get(f.channels, ''))
             items.append(mli)
@@ -245,7 +245,7 @@ class PlaylistDialog(kodigui.BaseDialog):
                 item.setProperty('moving', '1')
 
     def apply(self):
-        from kodijsonrpc import rpc
+        from .kodijsonrpc import rpc
 
         rpc.Playlist.Clear(playlistid=xbmc.PLAYLIST_VIDEO)
 

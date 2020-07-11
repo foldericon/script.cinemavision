@@ -394,4 +394,4 @@ class PastebinPython(object):
         except PastebinBadRequestException as e:
             retMsg = str(e)
 
-        return retMsg.decode('utf-8')
+        return retMsg
