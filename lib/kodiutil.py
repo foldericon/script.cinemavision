@@ -6,6 +6,7 @@ import binascii
 import xbmc
 import xbmcgui
 import xbmcaddon
+import xbmcvfs
 
 API_LEVEL = 4
 
@@ -14,7 +15,7 @@ ADDON = xbmcaddon.Addon(ADDON_ID)
 
 
 def translatePath(path):
-    return xbmc.translatePath(path)
+    return xbmcvfs.translatePath(path)
 
 
 PROFILE_PATH = translatePath(ADDON.getAddonInfo('profile'))
@@ -33,7 +34,7 @@ def DEBUG():
 
 
 def LOG(msg):
-    xbmc.log('[- CinemaVision -]: {0}'.format(msg), xbmc.LOGNOTICE)
+    xbmc.log('[- CinemaVision -]: {0}'.format(msg), xbmc.LOGINFO)
 
 
 def DEBUG_LOG(msg):
@@ -46,11 +47,11 @@ def ERROR(msg=''):
     if msg:
         LOG(msg)
     import traceback
-    xbmc.log(traceback.format_exc(), xbmc.LOGNOTICE)
+    xbmc.log(traceback.format_exc(), xbmc.LOGINFO)
 
 
 def TEST(msg):
-    xbmc.log('-- TEST: {0}'.format(repr(msg)), xbmc.LOGNOTICE)
+    xbmc.log('-- TEST: {0}'.format(repr(msg)), xbmc.LOGINFO)
 
 
 def firstRun():
@@ -117,7 +118,7 @@ def getSetting(key, default=None):
 def getPathSetting(key, default=None):
     path = getSetting(key, default)
     if path and path.startswith('special://'):
-        return xbmc.translatePath(path)
+        return xbmcvfs.translatePath(path)
     return path
 
 def _processSetting(setting, default):
@@ -181,10 +182,11 @@ try:
         return xbmc.Monitor().waitForAbort(timeout)
 except:
     def wait(timeout):
+        monitor=xbmc.Monitor()
         start = time.time()
-        while not xbmc.abortRequested and time.time() - start < timeout:
-            xbmc.sleep(100)
-        return xbmc.abortRequested
+        while not monitor.abortRequested() and time.time() - start < timeout:
+            monitor.waitForAbort(1)
+        return monitor.abortRequested()
 
 
 def getPeanutButter():

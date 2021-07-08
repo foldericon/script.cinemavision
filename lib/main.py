@@ -231,7 +231,7 @@ class ItemSettingsWindow(kodigui.BaseDialog):
         elif options == cinemavision.sequence.LIMIT_DB_CHOICE:
             options = sItem.DBChoices(attr)
             if not options:
-                xbmcgui.Dialog().ok(T(32508, 'No Content'), '', T(32522, 'No matching content found.'))
+                xbmcgui.Dialog().ok(T(32508, 'No Content'), T(32522, 'No matching content found.'))
                 return False
             options.insert(0, (None, T(32322, 'Default')))
             idx = xbmcgui.Dialog().select(T(32523, 'Options'), [x[1] for x in options])
@@ -260,7 +260,7 @@ class ItemSettingsWindow(kodigui.BaseDialog):
         elif options == cinemavision.sequence.LIMIT_MULTI_SELECT:
             options = sItem.Select(attr)
             if not options:
-                xbmcgui.Dialog().ok(T(32525, 'No Options'), '', T(32526, 'No options found.'))
+                xbmcgui.Dialog().ok(T(32525, 'No Options'), T(32526, 'No options found.'))
                 return False
             result = cvutil.multiSelect(options)
             if result is False:
@@ -1044,7 +1044,7 @@ class SequenceEditorWindow(kodigui.BaseWindow):
         else:
             contentPath = kodiutil.getPathSetting('content.path')
             if not contentPath:
-                xbmcgui.Dialog().ok(T(32503, 'No Content Path'), ' ', T(32553, 'Please set the content path in addon settings.'))
+                xbmcgui.Dialog().ok(T(32503, 'No Content Path'), T(32553, 'Please set the content path in addon settings.'))
                 return
 
             path = cinemavision.util.pathJoin(contentPath, 'Sequences')
@@ -1081,29 +1081,25 @@ class SequenceEditorWindow(kodigui.BaseWindow):
         except cinemavision.exceptions.SequenceWriteReadEmptyException:
             xbmcgui.Dialog().ok(
                 T(32573, 'Failed'),
-                'Failed to verify sequence file after write!',
-                'Kodi may be unable to save to this location.'
+                'Failed to verify sequence file after write![CR]Kodi may be unable to save to this location.'
             )
             return
         except cinemavision.exceptions.SequenceWriteReadBadException:
             xbmcgui.Dialog().ok(
                 T(32573, 'Failed'),
-                'Bad sequence file verification after write!',
-                'The sequence file seems to have been corrupted when saving.'
+                'Bad sequence file verification after write![CR]The sequence file seems to have been corrupted when saving.'
             )
             return
         except cinemavision.exceptions.SequenceWriteReadUnknownException:
             xbmcgui.Dialog().ok(
                 T(32573, 'Failed'),
-                'Unknown error when verifying sequence file after write!',
-                'The sequence file may not have been saved.'
+                'Unknown error when verifying sequence file after write![CR]The sequence file may not have been saved.'
             )
             return
         if not success:
             xbmcgui.Dialog().ok(
                 T(32573, 'Failed'),
-                T(32606, 'Failed to write sequence file!'),
-                T(32607, 'Kodi may be unable to save to this location.')
+                T(32606, 'Failed to write sequence file!') + '[CR]' + T(32607, 'Kodi may be unable to save to this location.')
             )
             return
 
@@ -1155,23 +1151,20 @@ class SequenceEditorWindow(kodigui.BaseWindow):
         except cinemavision.exceptions.EmptySequenceFileException:
             xbmcgui.Dialog().ok(
                 T(32573, 'Failed'),
-                'Failed to read sequence file!',
-                'Kodi may be unable to read from this location.'
+                'Failed to read sequence file![CR]Kodi may be unable to read from this location.'
             )
             return
         except cinemavision.exceptions.BadSequenceFileException:
             xbmcgui.Dialog().ok(
                 T(32573, 'Failed'),
-                'Failed to read sequence file!',
-                'The sequence file may have been corrupted.'
+                'Failed to read sequence file![CR]The sequence file may have been corrupted.'
             )
             return
         except:
             kodiutil.ERROR()
             xbmcgui.Dialog().ok(
                 T(32573, 'Failed'),
-                'Failed to read sequence file!',
-                'There was an unknown error. See kodi.log for details.'
+                'Failed to read sequence file![CR]There was an unknown error. See kodi.log for details.'
             )
             return
 

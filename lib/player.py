@@ -31,9 +31,7 @@ def showNoFeaturesDialog():
     import xbmcgui
     xbmcgui.Dialog().ok(
         T(32561, 'No Features'),
-        T(32562, 'No movies are in the Queue.'),
-        '',
-        T(32563, 'Please queue some features and try again.')
+        T(32562, 'No movies are in the Queue.') + '[CR]' +  T(32563, 'Please queue some features and try again.')
     )
 
 

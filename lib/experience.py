@@ -97,6 +97,7 @@ class KodiVolumeControl:
         self.saved = self.current()
 
     def restore(self, delay=0):
+        monitor=xbmc.Monitor()
         if self._restoring:
             return
 
@@ -106,7 +107,7 @@ class KodiVolumeControl:
                 return
 
             if delay:
-                xbmc.sleep(delay)
+                monitor.waitForAbort(int(delay/1000))
 
             DEBUG_LOG('Restoring volume to: {0}'.format(self.saved))
 
@@ -157,11 +158,12 @@ class KodiVolumeControl:
         left = duration
 
         DEBUG_LOG('Fade: START ({0}) - {1}ms'.format(start, fade_time_millis))
+        monitor=xbmc.Monitor()
         while time.time() < endTime and not kodiutil.wait(0.1):
             while xbmc.getCondVisibility('Player.Paused') and not kodiutil.wait(0.1):
                 endTime = time.time() + left
 
-            if xbmc.abortRequested or not xbmc.getCondVisibility('Player.Playing') or self.abortFlag.isSet() or self._stop():
+            if monitor.abortRequested() or not xbmc.getCondVisibility('Player.Playing') or self.abortFlag.isSet() or self._stop():
                 DEBUG_LOG(
                     'Fade ended early({0}): {1}'.format(vol, not xbmc.getCondVisibility('Player.Playing') and 'NOT_PLAYING' or 'ABORT')
                 )
@@ -265,9 +267,10 @@ class ExperienceWindow(kodigui.BaseWindow):
     #     kodiutil.setGlobalProperty('show1', not self.currentImage and '1' or '')
 
     def change(self, url):
+        monitor=xbmc.Monitor()
         kodiutil.setGlobalProperty('image0', self.lastImage)
         kodiutil.setGlobalProperty('show1', '')
-        xbmc.sleep(100)
+        monitor.WaitForAbort(1)
         kodiutil.setGlobalProperty('image1', url)
         kodiutil.setGlobalProperty('show1', '1')
         self.lastImage = url
@@ -903,10 +906,11 @@ class ExperiencePlayer(xbmc.Player):
 
         self.videoPreDelay()
         rpc.Player.Open(item={'playlistid': xbmc.PLAYLIST_VIDEO, 'position': 1}, options={'shuffled': False, 'resume': False, 'repeat': 'off'})
-        xbmc.sleep(100)
+        monitor=xbmc.Monitor()
+        monitor.waitForAbort(1)
         while not xbmc.getCondVisibility('VideoPlayer.IsFullscreen') and not xbmc.abortRequested and not self.abortFlag.isSet() and self.isPlaying():
             xbmc.executebuiltin('ActivateWindow(fullscreenvideo)')
-            xbmc.sleep(100)
+            monitor.waitForAbort(1)
         self.hasFullscreened = True
         DEBUG_LOG('VIDEO HAS GONE FULLSCREEN')
 
@@ -935,8 +939,9 @@ class ExperiencePlayer(xbmc.Player):
     def videoPreDelay(self):
         delay = kodiutil.getSetting('video.preDelay', 0)
         if delay:
+            monitor=xbmc.Monitor()
             kodiutil.DEBUG_LOG('Video pre-dalay: {0}ms'.format(delay))
-            xbmc.sleep(delay)
+            monitor.waitForAbort(int(delay/1000))
 
     def isPlayingMinimized(self):
         if not xbmc.getCondVisibility('Player.Playing'):  # isPlayingVideo() returns True before video actually plays (ie. is fullscreen)
@@ -1264,7 +1269,7 @@ class ExperiencePlayer(xbmc.Player):
     def doAction(self, action):
         action.run()
 
-    def next(self, prev=False):
+    def __next__(self, prev=False):
         if not self.processor or self.processor.atEnd():
             return
 

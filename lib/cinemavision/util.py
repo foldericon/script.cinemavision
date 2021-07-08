@@ -101,7 +101,7 @@ try:
     import stat
     import time
 
-    STORAGE_PATH = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
+    STORAGE_PATH = xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
     _T = xbmcaddon.Addon().getLocalizedString
 
     def T(ID, eng=''):
@@ -177,12 +177,12 @@ try:
 
     def translatePath(path):
         if path.startswith('special://'):
-            return xbmc.translatePath(path)
+            return xbmcvfs.translatePath(path)
 
         return path
 
     def LOG(msg):
-        xbmc.log('[- CinemaVision -] (API): {0}'.format(msg), xbmc.LOGNOTICE)
+        xbmc.log('[- CinemaVision -] (API): {0}'.format(msg), xbmc.LOGINFO)
 
     try:
         xbmc.Monitor().waitForAbort
@@ -192,9 +192,10 @@ try:
     except:
         def wait(timeout):
             start = time.time()
-            while not xbmc.abortRequested and time.time() - start < timeout:
-                xbmc.sleep(100)
-            return xbmc.abortRequested
+            monitor=xbmc.Monitor()
+            while not monitor.abortRequested() and time.time() - start < timeout:
+                monitor.waitForAbort(1)
+            return monitor.abortRequested()
 
     def getSettingDefault(key):
         default = xbmcaddon.Addon().getSetting(key)

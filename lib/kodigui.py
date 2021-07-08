@@ -689,9 +689,10 @@ class PropertyTimer():
             self._closeWin.doClose()
 
     def _wait(self):
-        while not xbmc.abortRequested and time.time() < self._endTime:
-            xbmc.sleep(100)
-        if xbmc.abortRequested:
+        monitor=xbmc.Monitor()
+        while not monitor.abortRequested() and time.time() < self._endTime:
+            monitor.waitForAbort(1)
+        if monitor.abortRequested():
             return
         if self._endTime == 0:
             return

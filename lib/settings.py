@@ -45,12 +45,13 @@ def _pasteLog(logName='kodi.log'):
     import re
     import xbmc
     import xbmcgui
+    import xbmcvfs
     from .pastebin_python import PastebinPython
 
-    logPath = os.path.join(xbmc.translatePath('special://logpath'), logName)
+    logPath = os.path.join(xbmcvfs.translatePath('special://logpath'), logName)
 
     if not os.path.exists(logPath):
-        xbmcgui.Dialog().ok(T(32570, 'No Log'), ' ', T(32571, 'That log file does not exist!'))
+        xbmcgui.Dialog().ok(T(32570, 'No Log') + '[CR]' + T(32571, 'That log file does not exist!'))
         return False
 
     def debug_log(msg):
@@ -83,14 +84,14 @@ def _pasteLog(logName='kodi.log'):
             debug_log('Getting API user key')
             apiUserKey = pb.createAPIUserKey(apiUser, password)
             if apiUserKey.lower().startswith('bad'):
-                xbmcgui.Dialog().ok(T(32573, 'Failed'), '{0}: {1}'.format(T(32574, 'Failed to create paste as user'), apiUser), '', apiUserKey)
+                xbmcgui.Dialog().ok(T(32573, 'Failed'), '{0}: {1}'.format(T(32574, 'Failed to create paste as user'), apiUser) + '[CR]' +  apiUserKey)
                 debug_log('Failed get user API key ({0}): {1}'.format(apiUser, apiUserKey))
             else:
                 with open(apiUserKeyFile, 'w') as f:
                     f.write(apiUserKey)
         else:
             debug_log('User aborted')
-            xbmcgui.Dialog().ok(T(32575, 'Aborted'), ' ', T(32576, 'Paste aborted!'))
+            xbmcgui.Dialog().ok(T(32575, 'Aborted'), T(32576, 'Paste aborted!'))
             return False
 
     elif apiUserKey:
@@ -115,7 +116,7 @@ def _pasteLog(logName='kodi.log'):
         )
         debug_log('Paste created: {0}'.format(urlOrError))
     else:
-        xbmcgui.Dialog().ok(T(32573, 'Failed'), T(32581, 'Failed to create paste:'), '', urlOrError)
+        xbmcgui.Dialog().ok(T(32573, 'Failed'), T(32581, 'Failed to create paste:') + '[CR]' + urlOrError)
         debug_log('Failed to create paste: {0}'.format(urlOrError))
 
     if showQR:
@@ -161,7 +162,7 @@ def deleteUserKey():
     apiUserKeyFile = os.path.join(kodiutil.PROFILE_PATH, 'settings.pb.key')
     if os.path.exists(apiUserKeyFile):
         os.remove(apiUserKeyFile)
-    xbmcgui.Dialog().ok(T(32515, 'Done'), ' ', T(32585, 'User key deleted.'))
+    xbmcgui.Dialog().ok(T(32515, 'Done'),  T(32585, 'User key deleted.'))
 
 
 def removeContentDatabase():

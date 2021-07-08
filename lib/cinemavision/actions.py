@@ -71,14 +71,15 @@ class SleepCommand(ActionCommand):
 
         now = time.time()
         end = now + (totalMS / 1000.0)
-        ms = min(totalMS, 200)
+        ms = min(totalMS / 1000.0 , 1)
 
         self.log('Action (Sleep) Start: {0} ({1})'.format(self.commandData, now))
 
-        while not xbmc.abortRequested and now < end and xbmc.getInfoLabel('Window(10000).Property(script.cinemavision.running)'):
-            xbmc.sleep(ms)
+        monitor = xbmc.Monitor()
+        while not monitor.abortRequested() and now < end and xbmc.getInfoLabel('Window(10000).Property(script.cinemavision.running)'):
+            monitor.waitForAbort(ms)
             now = time.time()
-            ms = min(int((end - now) * 1000), 200)
+            ms = min(int(end - now) , 1)
 
         self.log('Action (Sleep) End: {0} ({1})'.format(self.commandData, now))
 

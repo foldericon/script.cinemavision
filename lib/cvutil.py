@@ -95,7 +95,7 @@ def selectSequence(active=True, for_dialog=False):
 
     contentPath = getSequencesContentPath()
     if not contentPath:
-        xbmcgui.Dialog().ok(T(32500, 'Not Found'), ' ', T(32501, 'No sequences found.'))
+        xbmcgui.Dialog().ok(T(32500, 'Not Found'), T(32501, 'No sequences found.'))
         return None
 
     sequences = getActiveSequences(active=active, for_dialog=for_dialog)
@@ -112,7 +112,7 @@ def selectSequence(active=True, for_dialog=False):
     options.append((default3D, '[ {0} ]'.format(T(32600, 'Default 3D'))))
 
     if not options:
-        xbmcgui.Dialog().ok(T(32500, 'Not Found'), ' ', T(32501, 'No sequences found.'))
+        xbmcgui.Dialog().ok(T(32500, 'Not Found') ,T(32501, 'No sequences found.'))
         return None
 
     idx = xbmcgui.Dialog().select(T(32502, 'Choose Sequence'), [o[1] for o in options])
@@ -247,7 +247,7 @@ def loadContent(from_settings=False, bg=False):
     import xbmcgui
 
     if from_settings and not kodiutil.getPathSetting('content.path'):
-        xbmcgui.Dialog().ok(T(32503, 'No Content Path'), ' ', T(32504, 'Content path not set or not applied'))
+        xbmcgui.Dialog().ok(T(32503, 'No Content Path'), T(32504, 'Content path not set or not applied'))
         return
 
     contentPath = getContentPath(from_load=True)
@@ -316,7 +316,8 @@ def downloadDemoContent():
 
     z = zipfile.ZipFile(output)
     z.extractall(target)
-    xbmc.sleep(500)
+    monitor=xbmc.Monitor()
+    monitor.waitForAbort(1)
     try:
         os.remove(output)
     except:
@@ -338,7 +339,7 @@ def setRatingBumperStyle():
     styles = cinemavision.sequence.Feature.DBChoices('ratingStyle')
 
     if not styles:
-        xbmcgui.Dialog().ok(T(32508, 'No Content'), '', T(32509, 'No content found for current rating system.'))
+        xbmcgui.Dialog().ok(T(32508, 'No Content'), T(32509, 'No content found for current rating system.'))
         return
 
     idx = xbmcgui.Dialog().select(T(32510, 'Select Style'), [x[1] for x in styles])
