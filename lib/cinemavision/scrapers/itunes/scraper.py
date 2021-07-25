@@ -15,9 +15,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import re
-import urllib2
-import urlparse
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 import json
 import time
 import datetime
@@ -56,6 +59,7 @@ class Scraper(object):
     def __get_movie_id(self, url):
         headers = {'User-Agent': BROWSER_UA}
         html = self.__get_url(url, headers)
+        html = html.decode('utf-8') 
         match = re.search('''var\s+FilmId\s+=\s*['"]([^"']+)''', html)
         if match:
             return match.group(1)
@@ -98,7 +102,7 @@ class Scraper(object):
             yield meta
 
     def get_trailers(self, location, movie_id):
-        page_url = urlparse.urljoin(BASE_URL, location)
+        page_url = urllib.parse.urljoin(BASE_URL, location)
         if not movie_id.isdigit():
             movie_id = self.__get_movie_id(page_url)
 
@@ -142,6 +146,7 @@ class Scraper(object):
 
     def __get_extras(self):
         xml = self.__get_url(XML_URL)
+        xml = xml.decode('utf-8')
         xml = re.sub('[^\x00-\x7F]', '', xml)
         xml = re.sub('[\x01-\x08\x0B-\x0C\x0E-\x1F]', '', xml)
         root = ET.fromstring(xml)
@@ -248,12 +253,12 @@ class Scraper(object):
 
     def __make_poster(self, url):
         if not url.startswith('http'):
-            url = urlparse.urljoin(COVER_BASE_URL, url)
+            url = urllib.parse.urljoin(COVER_BASE_URL, url)
         return url.replace('poster', 'poster-xlarge')
 
     def __make_background(self, url):
         if not url.startswith('http'):
-            url = urlparse.urljoin(COVER_BASE_URL, url)
+            url = urllib.parse.urljoin(COVER_BASE_URL, url)
         return url.replace('poster', 'background')
 
     def __get_json(self, url, headers=None):
@@ -267,6 +272,6 @@ class Scraper(object):
         if headers is None:
             headers = {'User-Agent': USER_AGENT}
 
-        req = urllib2.Request(url, None, headers)
-        html = urllib2.urlopen(req).read()
+        req = urllib.request.Request(url, None, headers)
+        html = urllib.request.urlopen(req).read()
         return html

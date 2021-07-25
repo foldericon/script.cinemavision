@@ -875,10 +875,10 @@ class ExperiencePlayer(xbmc.Player):
             if video.userAgent:
                 path += '|User-Agent=' + video.userAgent
 
-        li = xbmcgui.ListItem(video.title, 'CinemaVision', thumbnailImage=video.thumb, path=path)
+        li = xbmcgui.ListItem(video.title, 'CinemaVision', path=path)
+        li.setArt({'icon': video.thumb, 'thumb': video.thumb})
         li.setInfo('video', {'title': video.title})
-        li.setIconImage(video.thumb)
-
+ 
         return path, li
 
     def playVideos(self, videos, features=None):
@@ -908,7 +908,7 @@ class ExperiencePlayer(xbmc.Player):
         rpc.Player.Open(item={'playlistid': xbmc.PLAYLIST_VIDEO, 'position': 1}, options={'shuffled': False, 'resume': False, 'repeat': 'off'})
         monitor=xbmc.Monitor()
         monitor.waitForAbort(1)
-        while not xbmc.getCondVisibility('VideoPlayer.IsFullscreen') and not xbmc.abortRequested and not self.abortFlag.isSet() and self.isPlaying():
+        while not xbmc.getCondVisibility('VideoPlayer.IsFullscreen') and not monitor.abortRequested() and not self.abortFlag.isSet() and self.isPlaying():
             xbmc.executebuiltin('ActivateWindow(fullscreenvideo)')
             monitor.waitForAbort(1)
         self.hasFullscreened = True
